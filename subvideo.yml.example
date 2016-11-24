@@ -1,0 +1,11 @@
+youtube:
+  developerkey:
+  mychannelid:
+twitch:
+  clientid:
+  mychannelname:
+basicauth:
+  username: username
+  password: password
+timezone:
+  zone: UTC
