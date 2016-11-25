@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
-	"sort"
 	"time"
 
 	"github.com/mrshankly/go-twitch/twitch"
+
 	"google.golang.org/api/googleapi/transport"
 	youtube "google.golang.org/api/youtube/v3"
 )
@@ -21,7 +22,6 @@ type SubVideo struct {
 	URL         string
 	ThumbURL    string
 	Date        time.Time
-	dateInt     int64
 }
 
 type ChannelOnline struct {
@@ -33,18 +33,13 @@ type ChannelOnline struct {
 	ThumbURL  string
 }
 
-type byDate []SubVideo
-
-func (a byDate) Len() int           { return len(a) }
-func (a byDate) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a byDate) Less(i, j int) bool { return a[i].dateInt > a[j].dateInt }
-
 type ClientVideo struct {
 	client      *http.Client
 	twClientID  string
 	twUserName  string
 	ytChannelID string
 	TimeZone    *time.Location
+	DataBase    DB
 }
 
 func InitClientVideo(twClientID, ytDeveloperKey, twUserName, ytChannelID string) (clientVideo ClientVideo) {
@@ -60,19 +55,12 @@ func InitClientVideo(twClientID, ytDeveloperKey, twUserName, ytChannelID string)
 }
 
 func (clientVideo ClientVideo) SortVideo(n int) (subVideos []SubVideo, err error) {
-	subVideos, err = clientVideo.twGetVideo(subVideos)
+	subVideos, err = client.DataBase.Select(n)
 	if err != nil {
+		log.Fatal(err)
 		return subVideos, err
 	}
-	subVideos, err = clientVideo.ytGetVideo(subVideos)
-	if err != nil {
-		return subVideos, err
-	}
-	sort.Sort(byDate(subVideos))
 
-	if len(subVideos) >= n {
-		return subVideos[:n], nil
-	}
 	return subVideos, nil
 }
 
@@ -108,7 +96,7 @@ func (clientVideo ClientVideo) ChannelsOnline() (channelOnline []ChannelOnline, 
 	return channelOnline, nil
 }
 
-func (clientVideo ClientVideo) twGetVideo(subVideos []SubVideo) (_ []SubVideo, err error) {
+func (clientVideo ClientVideo) TWGetVideo() (err error) {
 	clientTW := twitch.NewClient(clientVideo.client)
 	clientTW.ClientId = clientVideo.twClientID
 	opt := &twitch.ListOptions{
@@ -118,39 +106,41 @@ func (clientVideo ClientVideo) twGetVideo(subVideos []SubVideo) (_ []SubVideo, e
 
 	fol, err := clientTW.Users.Follows(clientVideo.twUserName, opt)
 	if err != nil {
-		return subVideos, fmt.Errorf("GW!Twitch-Users-Follows %s", err)
+		return err
 	}
 
 	for _, follow := range fol.Follows {
 		videos, err := clientTW.Channels.Videos(follow.Channel.Name, opt)
 		if err != nil {
-			return subVideos, fmt.Errorf("GW!Twitch-Channels-Videos %s", err)
+			return err
 		}
 		for _, video := range videos.Videos {
 			twTime, err := time.Parse(time.RFC3339, video.RecordedAt)
 			if err != nil {
-				return subVideos, err
+				return err
 			}
 
-			subVideos = append(subVideos, SubVideo{
-				TypeSub:     "twitch",
-				Title:       video.Title,
-				Channel:     video.Channel.DisplayName,
-				ChannelID:   video.Channel.Name,
-				Game:        video.Game,
-				Description: video.Description,
-				URL:         video.Url,
-				ThumbURL:    video.Preview,
-				Date:        twTime.In(client.TimeZone),
-				dateInt:     twTime.Unix(),
-			})
+			err = clientVideo.DataBase.Insert(
+				"twitch",
+				video.Title,
+				video.Channel.DisplayName,
+				video.Channel.Name,
+				video.Game,
+				video.Description,
+				video.Url,
+				video.Preview,
+				twTime.In(client.TimeZone),
+			)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
-	return subVideos, nil
+	return nil
 }
 
-func (clientVideo ClientVideo) ytGetVideo(subVideos []SubVideo) (_ []SubVideo, err error) {
+func (clientVideo ClientVideo) YTGetVideo() (err error) {
 	service, _ := youtube.New(clientVideo.client)
 	call := service.Subscriptions.List("snippet").
 		ChannelId(clientVideo.ytChannelID).
@@ -169,28 +159,31 @@ func (clientVideo ClientVideo) ytGetVideo(subVideos []SubVideo) (_ []SubVideo, e
 
 		responseVideo, err := callVideo.Do()
 		if err != nil {
-			return subVideos, err
+			return err
 		}
 
 		for _, video := range responseVideo.Items {
 			ytTime, err := time.Parse(time.RFC3339, video.Snippet.PublishedAt)
 			if err != nil {
-				return subVideos, err
+				return err
 			}
 
-			subVideos = append(subVideos, SubVideo{
-				TypeSub:     "youtube",
-				Title:       video.Snippet.Title,
-				Description: video.Snippet.Description,
-				Channel:     video.Snippet.ChannelTitle,
-				ChannelID:   video.Snippet.ChannelId,
-				Game:        "",
-				URL:         "https://www.youtube.com/watch?v=" + video.Id.VideoId,
-				ThumbURL:    video.Snippet.Thumbnails.High.Url,
-				Date:        ytTime.In(client.TimeZone),
-				dateInt:     ytTime.Unix(),
-			})
+			err = clientVideo.DataBase.Insert(
+				"youtube",
+				video.Snippet.Title,
+				video.Snippet.ChannelTitle,
+				video.Snippet.ChannelId,
+				"",
+				video.Snippet.Description,
+				"https://www.youtube.com/watch?v="+video.Id.VideoId,
+				video.Snippet.Thumbnails.High.Url,
+				ytTime.In(client.TimeZone),
+			)
+			if err != nil {
+				return err
+			}
 		}
 	}
-	return subVideos, nil
+
+	return nil
 }

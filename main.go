@@ -22,6 +22,13 @@ type configYML struct {
 		ClientID      string
 		MyChannelName string
 	}
+	DataBase struct {
+		Host     string
+		Port     string
+		DBname   string
+		UserName string
+		Password string
+	}
 	BasicAuth struct {
 		Username string
 		Password string
@@ -50,6 +57,17 @@ func main() {
 	if err != nil {
 		client.TimeZone, _ = time.LoadLocation("UTC")
 	}
+	client.DataBase, err = DBInit(
+		config.DataBase.Host,
+		config.DataBase.Port,
+		config.DataBase.UserName,
+		config.DataBase.Password,
+		config.DataBase.DBname,
+	)
+	if err != nil {
+		log.Fatal("DB ERR: ", err)
+	}
+	go runTime()
 
 	fs := http.FileServer(http.Dir("./view/static"))
 	http.Handle("/static/", http.StripPrefix("/static", fs))
@@ -69,19 +87,19 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		SubVideos     []SubVideo
 		ChannelOnline []ChannelOnline
 	}
+
 	subVideos, err := client.SortVideo(40)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
-	channelOnline, err := client.ChannelsOnline()
-	if err != nil {
-		log.Fatal(err)
-	}
+	// channelOnline, err := client.ChannelsOnline()
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	t, _ := template.ParseFiles("./view/index.html")
 	t.Execute(w, temp{
-		SubVideos:     subVideos,
-		ChannelOnline: channelOnline,
+		SubVideos: subVideos,
 	})
 }
 
@@ -107,6 +125,40 @@ func basicAuth(handler http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 		handler(w, r)
+	}
+}
+
+func runTime() {
+	run := true
+
+	log.Println("This RUN groutine")
+
+	err := client.YTGetVideo()
+	if err != nil {
+		log.Println("ERR YT: ", err)
+	}
+	err = client.TWGetVideo()
+	if err != nil {
+		log.Println("ERR TW: ", err)
+	}
+
+	for {
+		if time.Now().Minute()%5 == 0 && run {
+			log.Println("RUN groutine")
+			run = false
+			err := client.YTGetVideo()
+			if err != nil {
+				log.Println("ERR YT: ", err)
+			}
+			err = client.TWGetVideo()
+			if err != nil {
+				log.Println("ERR TW: ", err)
+			}
+		} else {
+			run = true
+		}
+
+		time.Sleep(time.Second * 30)
 	}
 }
 
