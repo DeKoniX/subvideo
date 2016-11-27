@@ -56,7 +56,18 @@ func (tw TW) OAuthTest(oauth string) (user User, err error) {
 		return user, fmt.Errorf("ERR Twitch API: %s, %s", twjson.Error, twjson.Message)
 	}
 
+	curUser, _ := clientVideo.DataBase.SelectUserForUserName(twjson.DisplayName)
+
+	if len(curUser) > 0 {
+		return User{
+			YTChannelID: curUser[0].YTChannelID,
+			TWChannelID: twjson.Name,
+			UserName:    twjson.DisplayName,
+			AvatarURL:   twjson.Logo,
+		}, nil
+	}
 	return User{
+		YTChannelID: "",
 		TWChannelID: twjson.Name,
 		UserName:    twjson.DisplayName,
 		AvatarURL:   twjson.Logo,

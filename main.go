@@ -113,7 +113,7 @@ func twOAuthHandler(w http.ResponseWriter, r *http.Request) {
 	hash := crypt(user.UserName, date)
 
 	err = clientVideo.DataBase.InsertUser(
-		"",
+		user.YTChannelID,
 		user.TWChannelID,
 		oauth,
 		user.UserName,
@@ -185,7 +185,8 @@ func currentUser(r *http.Request) (user User) {
 	}
 	users, err := clientVideo.DataBase.SelectUserForUserName(username)
 	if err != nil {
-		log.Panicln(err)
+		log.Println(err)
+		return User{}
 	}
 	if len(users) == 0 {
 		return User{}
