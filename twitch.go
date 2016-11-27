@@ -69,7 +69,7 @@ func (tw TW) Auth(code string) (oauth string) {
 			"client_id":     {tw.ClientID},
 			"client_secret": {tw.ClientSecret},
 			"grant_type":    {"authorization_code"},
-			"redirect_uri":  {"http://localhost:8181/twitch/oauth"},
+			"redirect_uri":  {config.Twitch.RedirectURI},
 			"code":          {code},
 		},
 	)

@@ -107,6 +107,7 @@ func twOAuthHandler(w http.ResponseWriter, r *http.Request) {
 	user, err := tw.OAuthTest(oauth)
 	if err != nil {
 		log.Panicln(err)
+		// TODO: редирект на /
 	}
 	date := time.Now().UTC()
 	hash := crypt(user.UserName, date)
