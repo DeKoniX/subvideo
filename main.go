@@ -98,7 +98,7 @@ func logoutHandler(w http.ResponseWriter, r *http.Request) {
 		MaxAge: -1,
 		Path:   "/",
 	})
-	http.Redirect(w, r, "/", 301)
+	http.Redirect(w, r, "/", 302)
 }
 
 func twOAuthHandler(w http.ResponseWriter, r *http.Request) {
@@ -143,7 +143,7 @@ func twOAuthHandler(w http.ResponseWriter, r *http.Request) {
 		Expires: time.Now().Add(time.Hour * 24 * 30),
 		Path:    "/",
 	})
-	http.Redirect(w, r, "/", 301)
+	http.Redirect(w, r, "/", 302)
 }
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
@@ -227,7 +227,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 			User:          user,
 		})
 	} else {
-		http.Redirect(w, r, "/login", 301)
+		http.Redirect(w, r, "/login", 302)
 	}
 }
 
@@ -250,7 +250,7 @@ func userHandler(w http.ResponseWriter, r *http.Request) {
 			User: user,
 		})
 	} else {
-		http.Redirect(w, r, "/login", 301)
+		http.Redirect(w, r, "/login", 302)
 	}
 }
 
@@ -281,9 +281,9 @@ func userChangeHandler(w http.ResponseWriter, r *http.Request) {
 
 		user = currentUser(r)
 		go runUser(user)
-		http.Redirect(w, r, "/", 301)
+		http.Redirect(w, r, "/", 302)
 	} else {
-		http.Redirect(w, r, "/login", 301)
+		http.Redirect(w, r, "/login", 302)
 	}
 }
 
