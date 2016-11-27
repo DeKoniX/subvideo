@@ -54,8 +54,8 @@ func InitClientVideo(twClientID, ytDeveloperKey, twUserName, ytChannelID string)
 	return clientVideo
 }
 
-func (clientVideo ClientVideo) SortVideo(n int) (subVideos []SubVideo, err error) {
-	subVideos, err = client.DataBase.Select(n)
+func (clientVideo ClientVideo) SortVideo(user User, n int) (subVideos []SubVideo, err error) {
+	subVideos, err = clientVideo.DataBase.SelectVideo(user.ID, n)
 	if err != nil {
 		log.Fatal(err)
 		return subVideos, err
@@ -96,56 +96,43 @@ func (clientVideo ClientVideo) ChannelsOnline() (channelOnline []ChannelOnline, 
 	return channelOnline, nil
 }
 
-func (clientVideo ClientVideo) TWGetVideo() (err error) {
-	clientTW := twitch.NewClient(clientVideo.client)
-	clientTW.ClientId = clientVideo.twClientID
-	opt := &twitch.ListOptions{
-		Limit:  50,
-		Offset: 0,
-	}
-
-	fol, err := clientTW.Users.Follows(clientVideo.twUserName, opt)
-	if err != nil {
-		return err
-	}
-
-	for _, follow := range fol.Follows {
-		videos, err := clientTW.Channels.Videos(follow.Channel.Name, opt)
+func (clientVideo ClientVideo) TWGetVideo(user User) (err error) {
+	videos := tw.GetVideos(user.TWOAuth)
+	for _, video := range videos {
+		err = clientVideo.DataBase.InsertVideo(
+			user.ID,
+			video.TypeSub,
+			video.Title,
+			video.Channel,
+			video.ChannelID,
+			video.Game,
+			video.Description,
+			video.URL,
+			video.ThumbURL,
+			video.Date,
+		)
 		if err != nil {
 			return err
-		}
-		for _, video := range videos.Videos {
-			twTime, err := time.Parse(time.RFC3339, video.RecordedAt)
-			if err != nil {
-				return err
-			}
-
-			err = clientVideo.DataBase.Insert(
-				"twitch",
-				video.Title,
-				video.Channel.DisplayName,
-				video.Channel.Name,
-				video.Game,
-				video.Description,
-				video.Url,
-				video.Preview,
-				twTime.In(client.TimeZone),
-			)
-			if err != nil {
-				return err
-			}
 		}
 	}
 
 	return nil
 }
 
-func (clientVideo ClientVideo) YTGetVideo() (err error) {
+func (clientVideo ClientVideo) YTGetVideo(user User) (err error) {
+	log.Println("RUN YTGETVIDEO: ", user.YTChannelID)
+	if user.YTChannelID == "" {
+		return nil
+	}
+
 	service, _ := youtube.New(clientVideo.client)
 	call := service.Subscriptions.List("snippet").
-		ChannelId(clientVideo.ytChannelID).
+		ChannelId(user.YTChannelID).
 		MaxResults(50)
-	response, _ := call.Do()
+	response, err := call.Do()
+	if err != nil {
+		return err
+	}
 
 	for _, item := range response.Items {
 		channelID := item.Snippet.ResourceId.ChannelId
@@ -168,7 +155,8 @@ func (clientVideo ClientVideo) YTGetVideo() (err error) {
 				return err
 			}
 
-			err = clientVideo.DataBase.Insert(
+			err = clientVideo.DataBase.InsertVideo(
+				user.ID,
 				"youtube",
 				video.Snippet.Title,
 				video.Snippet.ChannelTitle,
@@ -177,7 +165,7 @@ func (clientVideo ClientVideo) YTGetVideo() (err error) {
 				video.Snippet.Description,
 				"https://www.youtube.com/watch?v="+video.Id.VideoId,
 				video.Snippet.Thumbnails.High.Url,
-				ytTime.In(client.TimeZone),
+				ytTime.In(clientVideo.TimeZone),
 			)
 			if err != nil {
 				return err

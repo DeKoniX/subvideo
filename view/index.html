@@ -14,6 +14,28 @@
 </head>
 
 <body>
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse" aria-expanded="false">
+          <span class="sr-only">Свернуть</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/">VideoSUB</a>
+      </div>
+
+      <div class="collapse navbar-collapse" id="navbar-collapse">
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="/user">{{.User.UserName}}</a></li>
+          <li><a href="/logout">Выход</a></li>
+        </ul>
+
+      </div>
+
+    </div>
+  </nav>
   <div class="container">
     <h3>Сейчас идут стримы!</h3>
     <div class="row">
@@ -28,7 +50,7 @@
               <h4>{{.Title}}</h4>
             </a>
             <h4>{{.Game}}</h4>
-            <a href="https://www.twitch.tv/{{.ChannelID}}" class="btn btn-default">{{.Channel}}</a>
+            <a href="{{.URL}}" class="btn btn-default">{{.Channel}}</a>
             <button class="btn-btn-default jscopy right" id="copy-url" data-clipboard-text="mpv --ytdl-format=High {{.URL}}">
                   <span class="glyphicon glyphicon-copy" aria-hidden="true"></span>
                 </button>
@@ -48,7 +70,7 @@
           <div class="caption">
             {{if eq .TypeSub "youtube"}}
             <a href="{{.URL}}">
-              <h4><img src="/static/youtube.png" alt="YouTube"/>  {{.Title}}
+              <h4><img src="/static/ytube.png" alt="YouTube"/>  {{.Title}}
               </h4>
             </a>
             {{else}}
