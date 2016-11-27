@@ -17,12 +17,11 @@ import (
 type configYML struct {
 	YouTube struct {
 		DeveloperKey string
-		MyChannelID  string
 	}
 	Twitch struct {
-		ClientID      string
-		ClientSecret  string
-		MyChannelName string
+		ClientID     string
+		ClientSecret string
+		RedirectURI  string
 	}
 	DataBase struct {
 		Host     string
@@ -55,8 +54,6 @@ func main() {
 	clientVideo = InitClientVideo(
 		config.Twitch.ClientID,
 		config.YouTube.DeveloperKey,
-		config.Twitch.MyChannelName,
-		config.YouTube.MyChannelID,
 	)
 	clientVideo.TimeZone, err = time.LoadLocation(config.TimeZone.Zone)
 	if err != nil {
@@ -158,7 +155,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	q.Set("response_type", "code")
 	q.Set("client_id", tw.ClientID)
 	q.Set("scope", "user_read")
-	q.Set("redirect_uri", "http://localhost:8181/twitch/oauth")
+	q.Set("redirect_uri", config.Twitch.RedirectURI)
 	u.RawQuery = q.Encode()
 
 	t, _ := template.ParseFiles("./view/login.html")
