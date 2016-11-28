@@ -36,7 +36,7 @@
 
     </div>
   </nav>
-  <div class="container">
+  <div class="container-fluid">
     <h3>Сейчас идут стримы!</h3>
     <div class="row">
       {{range .ChannelOnline}}
@@ -62,7 +62,7 @@
     <h3>Что новенького?</h3>
     <div class="row">
       {{range .SubVideos}}
-      <div class="col-sm-6 col-md-4">
+      <div class="col-xs-12 col-sm-6 col-md-4">
         <div class="thumbnail">
           <a href="{{.URL}}">
             <img src="{{.ThumbURL}}" alt="{{.Title}}" />

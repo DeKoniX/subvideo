@@ -214,7 +214,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 			User          User
 		}
 
-		subVideos, err := clientVideo.SortVideo(user, 20)
+		subVideos, err := clientVideo.SortVideo(user, 40)
 		if err != nil {
 			log.Panicln(err)
 		}
@@ -322,7 +322,7 @@ func runTime() {
 	}
 
 	for {
-		if time.Now().Minute()%5 == 0 && run {
+		if time.Now().Minute()%30 == 0 && run {
 			log.Println("RUN groutine")
 			run = false
 			users, err = clientVideo.DataBase.SelectUsers()
