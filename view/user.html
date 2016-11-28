@@ -28,7 +28,10 @@
 
       <div class="collapse navbar-collapse" id="navbar-collapse">
         <ul class="nav navbar-nav navbar-right">
-          <li><a href="/user">{{.User.UserName}}</a></li>
+          <li class="hidden-xs">
+            <img src="{{.User.AvatarURL}}" alt="{{.User.UserName}}" width="45px" height="45px">
+          </li>
+          <li><a href="/user">Настройки</a></li>
           <li><a href="/logout">Выход</a></li>
         </ul>
 

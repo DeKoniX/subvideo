@@ -39,6 +39,10 @@ type configYML struct {
 	}
 }
 
+var funcMap = template.FuncMap{
+	"split": split,
+}
+
 var config configYML
 var clientVideo ClientVideo
 var tw TW
@@ -185,7 +189,6 @@ func currentUser(r *http.Request) (user User) {
 	}
 	users, err := clientVideo.DataBase.SelectUserForUserName(username)
 	if err != nil {
-		log.Println(err)
 		return User{}
 	}
 	if len(users) == 0 {
@@ -220,7 +223,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		channelOnline := tw.GetOnline(user.TWOAuth)
 
-		t, _ := template.ParseFiles("./view/index.html")
+		t := template.Must(template.New("index.html").Funcs(funcMap).ParseFiles("./view/index.html"))
 		t.Execute(w, temp{
 			SubVideos:     subVideos,
 			ChannelOnline: channelOnline,
@@ -235,7 +238,6 @@ func userHandler(w http.ResponseWriter, r *http.Request) {
 	var login bool
 
 	user := currentUser(r)
-	log.Println(user)
 	if user.UserName != "" {
 		login = true
 	}
@@ -288,7 +290,7 @@ func userChangeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func runUser(user User) {
-	log.Println("RUN User!")
+	log.Println("RUN User: ", user.UserName)
 	err := clientVideo.YTGetVideo(user)
 	if err != nil {
 		log.Println("ERR YT: ", err)
@@ -372,4 +374,8 @@ func cryptTest(username, hash string, dateChange time.Time) bool {
 	io.WriteString(h, dateChange.Format(time.Stamp))
 	thisHash := fmt.Sprintf("%x", h.Sum(nil))
 	return thisHash == hash
+}
+
+func split(a, b int) bool {
+	return a%b == 0
 }

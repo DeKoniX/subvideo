@@ -28,10 +28,12 @@
 
       <div class="collapse navbar-collapse" id="navbar-collapse">
         <ul class="nav navbar-nav navbar-right">
-          <li><a href="/user">{{.User.UserName}}</a></li>
+          <li class="hidden-xs">
+              <img src="{{.User.AvatarURL}}" alt="{{.User.UserName}}" width="45px" height="45px">
+          </li>
+          <li><a href="/user">Настройки</a></li>
           <li><a href="/logout">Выход</a></li>
         </ul>
-
       </div>
 
     </div>
@@ -39,19 +41,22 @@
   <div class="container-fluid">
     <h3>Сейчас идут стримы!</h3>
     <div class="row">
-      {{range .ChannelOnline}}
+      {{range $index, $channel := .ChannelOnline}}
+      {{if split $index 2}}
+        <div class="clearfix hidden-xs visible-md-block"></div>
+      {{end}}
       <div class="col-md-6">
         <div class="thumbnail">
-          <a href="{{.URL}}">
-            <img src="{{.ThumbURL}}" alt="{{.Title}}" />
+          <a href="{{$channel.URL}}">
+            <img src="{{$channel.ThumbURL}}" alt="{{$channel.Title}}" />
           </a>
           <div class="caption">
-            <a href="{{.URL}}">
+            <a href="{{$channel.URL}}">
               <h4>{{.Title}}</h4>
             </a>
-            <h4>{{.Game}}</h4>
-            <a href="{{.URL}}" class="btn btn-default">{{.Channel}}</a>
-            <button class="btn-btn-default jscopy right" id="copy-url" data-clipboard-text="mpv --ytdl-format=High {{.URL}}">
+            <h4>{{$channel.Game}}</h4>
+            <a href="{{.URL}}" class="btn btn-default">{{$channel.Channel}}</a>
+            <button class="btn-btn-default jscopy right" id="copy-url" data-clipboard-text="mpv --ytdl-format=High {{$channel.URL}}">
                   <span class="glyphicon glyphicon-copy" aria-hidden="true"></span>
                 </button>
           </div>
@@ -61,7 +66,10 @@
     </div>
     <h3>Что новенького?</h3>
     <div class="row">
-      {{range .SubVideos}}
+      {{range $index, $ := .SubVideos}}
+      {{if split $index 3}}
+        <div class="clearfix hidden-xs"></div>
+      {{end}}
       <div class="col-xs-12 col-sm-6 col-md-4">
         <div class="thumbnail">
           <a href="{{.URL}}">

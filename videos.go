@@ -81,7 +81,6 @@ func (clientVideo ClientVideo) TWGetVideo(user User) (err error) {
 }
 
 func (clientVideo ClientVideo) YTGetVideo(user User) (err error) {
-	log.Println("RUN YTGETVIDEO: ", user.YTChannelID)
 	if user.YTChannelID == "" {
 		return nil
 	}
