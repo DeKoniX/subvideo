@@ -220,8 +220,14 @@ func (DataBase *DB) InsertVideo(userID int, typeSub, title, channel, channelID, 
 	return nil
 }
 
-func (DataBase *DB) SelectVideo(userID, n int) (selectRows []SubVideo, err error) {
-	rows, err := DataBase.db.Query("SELECT type, title, channel, channel_id, game, description, url, thumb_url, date FROM subvideo WHERE user_id=$1 ORDER BY date DESC LIMIT $2", userID, n)
+func (DataBase *DB) SelectVideo(userID, n int, channelID string) (selectRows []SubVideo, err error) {
+	var rows *sql.Rows
+	if channelID == "" {
+		rows, err = DataBase.db.Query("SELECT type, title, channel, channel_id, game, description, url, thumb_url, date FROM subvideo WHERE user_id=$1 ORDER BY date DESC LIMIT $2", userID, n)
+	} else {
+		rows, err = DataBase.db.Query("SELECT type, title, channel, channel_id, game, description, url, thumb_url, date FROM subvideo WHERE user_id=$1 AND channel_id=$2 ORDER BY date DESC LIMIT $3", userID, channelID, n)
+	}
+
 	if err != nil {
 		return selectRows, err
 	}

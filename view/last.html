@@ -41,32 +41,7 @@
     </div>
   </nav>
   <div class="container">
-    <h2>Сейчас идут стримы!</h2>
-    <div class="row">
-      {{range $index, $channel := .ChannelOnline}} {{if split $index 2}}
-      <div class="clearfix hidden-xs visible-md-block"></div>
-      {{end}}
-      <div class="col-md-6">
-        <div class="thumbnail">
-          <a href="{{$channel.URL}}">
-            <img src="{{$channel.ThumbURL}}" alt="{{$channel.Title}}" />
-          </a>
-          <div class="caption">
-            <a href="{{$channel.URL}}">
-              <h4>{{.Title}}</h4>
-            </a>
-            <h4>{{$channel.Game}}</h4>
-            <a href="{{.URL}}" class="btn btn-default">{{$channel.Channel}}</a>
-            <button class="btn-btn-default jscopy right" id="copy-url" data-clipboard-text="mpv --ytdl-format=High {{$channel.URL}}">
-                  <span class="glyphicon glyphicon-copy" aria-hidden="true"></span>
-                </button>
-          </div>
-        </div>
-      </div>
-      {{end}}
-    </div>
-    <hr>
-    <h2>Что новенького?</h2>
+    <h2>Последние видео {{ $channel := index .SubVideos 0}}{{ $channel.Channel }}</h2>
     <div class="row">
       {{range $index, $ := .SubVideos}} {{if split $index 3}}
       <div class="clearfix hidden-xs"></div>
@@ -80,36 +55,25 @@
             {{if eq .TypeSub "youtube"}}
             <a href="{{.URL}}">
               <h4><img src="/static/ytube.png" alt="YouTube"/>  {{.Title}}
-              </h4>
+            </h4>
             </a>
             {{else}}
             <a href="{{.URL}}">
               <h4><img src="/static/twitch.png" alt="Twitch"/>  {{.Title}}
-              </h4>
+            </h4>
             </a>
             <h4>{{.Game}}</h4> {{end}}
             <p>{{.Description}}</p>
             <p>{{.Date}}</p>
-            <div class="btn-group">
-              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" area-haspopup="true" area-expanded="false">
-              {{.Channel}} <span class="caret"></span>
-            </button>
-              <ul class="dropdown-menu">
-                <li>{{if eq .TypeSub "youtube"}}
-                  <a href="https://www.youtube.com/channel/{{.ChannelID}}"><img src="/static/ytube.png" alt="YouTube" id="channelTitle" /> {{.Channel}}</a>
-                  {{else}}
-                  <a href="https://www.twitch.tv/{{.ChannelID}}"><img src="/static/twitch.png" alt="Twitch" id="channelTitle" /> {{.Channel}}</a>
-                  {{end}}</li>
-                <li><a href="/last?channelID={{.ChannelID}}">Последние видео</a></li>
-              </ul>
-            </div>
-            {{ if eq .TypeSub "youtube" }}
+            {{if eq .TypeSub "youtube"}}
+            <a href="https://www.youtube.com/channel/{{.ChannelID}}" class="btn btn-default">{{.Channel}}</a>
             <button class="btn-btn-default jscopy right" id="copy-url" data-clipboard-text="mpv --ytdl-format=136+bestaudio {{.URL}}">
-                  <span class="glyphicon glyphicon-copy" aria-hidden="true"></span>
-                </button> {{else}}
+                <span class="glyphicon glyphicon-copy" aria-hidden="true"></span>
+              </button> {{else}}
+            <a href="https://www.twitch.tv/{{.ChannelID}}" class="btn btn-default">{{.Channel}}</a>
             <button class="btn-btn-default jscopy right" id="copy-url" data-clipboard-text="mpv --ytdl-format=High {{.URL}}">
-                      <span class="glyphicon glyphicon-copy" aria-hidden="true"></span>
-                    </button> {{end}}
+                <span class="glyphicon glyphicon-copy" aria-hidden="true"></span>
+              </button> {{end}}
           </div>
         </div>
       </div>

@@ -17,3 +17,6 @@
 .right {
   float: right;
 }
+#channelTitle {
+  display: inline;
+}

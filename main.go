@@ -78,6 +78,7 @@ func main() {
 	fs := http.FileServer(http.Dir("./view/static"))
 	http.Handle("/static/", http.StripPrefix("/static", fs))
 	http.HandleFunc("/", indexHandler)
+	http.HandleFunc("/last", lastHandler)
 	http.HandleFunc("/twitch/oauth", twOAuthHandler)
 	http.HandleFunc("/login", loginHandler)
 	http.HandleFunc("/user", userHandler)
@@ -201,6 +202,39 @@ func currentUser(r *http.Request) (user User) {
 	return User{}
 }
 
+func lastHandler(w http.ResponseWriter, r *http.Request) {
+	var login bool
+
+	channelID := r.FormValue("channelID")
+
+	user := currentUser(r)
+	if user.UserName != "" {
+		login = true
+	}
+
+	if login {
+		type temp struct {
+			SubVideos []SubVideo
+			User      User
+		}
+
+		subVideos, err := clientVideo.SortVideo(user, 15, channelID)
+		if len(subVideos) == 0 {
+			http.Redirect(w, r, "/", 302)
+		}
+		if err != nil {
+			log.Panicln(err)
+		}
+		t := template.Must(template.New("last.html").Funcs(funcMap).ParseFiles("./view/last.html"))
+		t.Execute(w, temp{
+			SubVideos: subVideos,
+			User:      user,
+		})
+	} else {
+		http.Redirect(w, r, "/login", 302)
+	}
+}
+
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	var login bool
 
@@ -217,7 +251,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 			User          User
 		}
 
-		subVideos, err := clientVideo.SortVideo(user, 40)
+		subVideos, err := clientVideo.SortVideo(user, 40, "")
 		if err != nil {
 			log.Panicln(err)
 		}
