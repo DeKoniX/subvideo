@@ -46,6 +46,16 @@
         <label for="yt_channel_id">Ваш YouTube ID канала</label>
         <input type="text" name="yt_channel_id" value="{{.User.YTChannelID}}" class="form-control" placeholder="Введите ваш ID канала на YouTube">
       </div>
+      <select class="form-control" name="timezone">
+        {{$userTimeZone := .User.TimeZone}}
+        {{range .TimeZones}}
+        {{if ne .UTC $userTimeZone}}
+        <option>{{.UTC}}</option>
+        {{else}}
+        <option selected="">{{.UTC}}</option>
+        {{end}}
+        {{end}}
+      </select>
       <button type="submit" class="btn btn-default">Сохранить</button>
     </form>
     <hr>

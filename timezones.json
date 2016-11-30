@@ -1,0 +1,102 @@
+[
+  {
+    "offset": -12,
+    "utc": "Etc/GMT+12"
+  },
+  {
+    "offset": -11,
+    "utc": "Etc/GMT+11"
+  },
+  {
+    "offset": -10,
+    "utc": "Etc/GMT+10"
+  },
+  {
+    "offset": -7,
+    "utc": "Etc/GMT+7"
+  },
+  {
+    "offset": -6,
+    "utc": "Etc/GMT+6"
+  },
+  {
+    "offset": -5,
+    "utc": "Etc/GMT+5"
+  },
+  {
+    "offset": -4,
+    "utc": "Etc/GMT+4"
+  },
+  {
+    "offset": -3,
+    "utc": "Etc/GMT+3"
+  },
+  {
+    "offset": -2,
+    "utc": "Etc/GMT+2"
+  },
+  {
+    "offset": -1,
+    "utc": "Etc/GMT+1"
+  },
+  {
+    "offset": 0,
+    "utc": "Etc/GMT"
+  },
+  {
+    "offset": 0,
+    "utc": "UTC"
+  },
+  {
+    "offset": 1,
+    "utc": "Etc/GMT-1"
+  },
+  {
+    "offset": 2,
+    "utc": "Etc/GMT-2"
+  },
+  {
+    "offset": 3,
+    "utc": "Etc/GMT-3"
+  },
+  {
+    "offset": 4,
+    "utc": "Etc/GMT-4"
+  },
+  {
+    "offset": 5,
+    "utc": "Etc/GMT-5"
+  },
+  {
+    "offset": 6,
+    "utc": "Etc/GMT-6"
+  },
+  {
+    "offset": 7,
+    "utc": "Etc/GMT-7"
+  },
+  {
+    "offset": 8,
+    "utc": "Etc/GMT-8"
+  },
+  {
+    "offset": 9,
+    "utc": "Etc/GMT-9"
+  },
+  {
+    "offset": 10,
+    "utc": "Etc/GMT-10"
+  },
+  {
+    "offset": 11,
+    "utc": "Etc/GMT-11"
+  },
+  {
+    "offset": 12,
+    "utc": "Etc/GMT-12"
+  },
+  {
+    "offset": 13,
+    "utc": "Etc/GMT-13"
+  }
+]

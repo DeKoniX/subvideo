@@ -56,7 +56,7 @@ func (tw TW) OAuthTest(oauth string) (user User, err error) {
 		return user, fmt.Errorf("ERR Twitch API: %s, %s", twjson.Error, twjson.Message)
 	}
 
-	curUser, _ := clientVideo.DataBase.SelectUserForUserName(twjson.DisplayName)
+	curUser, _ := clientVideo.dataBase.SelectUserForUserName(twjson.DisplayName)
 
 	if len(curUser) > 0 {
 		return User{
@@ -163,7 +163,7 @@ func (tw TW) GetVideos(oauth string) (videos []SubVideo) {
 			Description: video.Description,
 			URL:         video.URL,
 			ThumbURL:    video.Preview,
-			Date:        twTime.In(clientVideo.TimeZone),
+			Date:        twTime.UTC(),
 		})
 
 	}

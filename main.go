@@ -2,6 +2,7 @@ package main
 
 import (
 	"crypto/md5"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"io"
@@ -40,30 +41,26 @@ type configYML struct {
 }
 
 var funcMap = template.FuncMap{
-	"split": split,
+	"split":    split,
+	"timeZone": timeZone,
 }
 
 var config configYML
 var clientVideo ClientVideo
-var tw TW
 
 func main() {
 	err := getConfig()
 	if err != nil {
 		log.Panic(err)
 	}
-	cli := &http.Client{}
-	tw = TWInit(cli, config.Twitch.ClientID, config.Twitch.ClientSecret)
 
 	clientVideo = InitClientVideo(
 		config.Twitch.ClientID,
+		config.Twitch.ClientSecret,
 		config.YouTube.DeveloperKey,
 	)
-	clientVideo.TimeZone, err = time.LoadLocation(config.TimeZone.Zone)
-	if err != nil {
-		clientVideo.TimeZone, _ = time.LoadLocation("UTC")
-	}
-	clientVideo.DataBase, err = DBInit(
+
+	clientVideo.dataBase, err = DBInit(
 		config.DataBase.Host,
 		config.DataBase.Port,
 		config.DataBase.UserName,
@@ -108,16 +105,16 @@ func logoutHandler(w http.ResponseWriter, r *http.Request) {
 
 func twOAuthHandler(w http.ResponseWriter, r *http.Request) {
 	code := r.FormValue("code")
-	oauth := tw.Auth(code)
-	user, err := tw.OAuthTest(oauth)
+	oauth := clientVideo.twClient.Auth(code)
+	user, err := clientVideo.twClient.OAuthTest(oauth)
 	if err != nil {
 		log.Panicln(err)
-		// TODO: редирект на /
+		http.Redirect(w, r, "/login", 302)
 	}
 	date := time.Now().UTC()
 	hash := crypt(user.UserName, date)
 
-	err = clientVideo.DataBase.InsertUser(
+	err = clientVideo.dataBase.InsertUser(
 		user.YTChannelID,
 		user.TWChannelID,
 		oauth,
@@ -130,7 +127,7 @@ func twOAuthHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Panic(err)
 	}
-	users, err := clientVideo.DataBase.SelectUserForUserName(user.UserName)
+	users, err := clientVideo.dataBase.SelectUserForUserName(user.UserName)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -159,7 +156,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	u, _ := url.Parse("https://api.twitch.tv/kraken/oauth2/authorize")
 	q := u.Query()
 	q.Set("response_type", "code")
-	q.Set("client_id", tw.ClientID)
+	q.Set("client_id", clientVideo.twClient.ClientID)
 	q.Set("scope", "user_read")
 	q.Set("redirect_uri", config.Twitch.RedirectURI)
 	u.RawQuery = q.Encode()
@@ -188,7 +185,7 @@ func currentUser(r *http.Request) (user User) {
 	if username == "" {
 		return User{}
 	}
-	users, err := clientVideo.DataBase.SelectUserForUserName(username)
+	users, err := clientVideo.dataBase.SelectUserForUserName(username)
 	if err != nil {
 		return User{}
 	}
@@ -244,7 +241,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if login {
-		tw.GetOnline(user.TWOAuth)
+		clientVideo.twClient.GetOnline(user.TWOAuth)
 		type temp struct {
 			SubVideos     []SubVideo
 			ChannelOnline []SubVideo
@@ -255,7 +252,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Panicln(err)
 		}
-		channelOnline := tw.GetOnline(user.TWOAuth)
+		channelOnline := clientVideo.twClient.GetOnline(user.TWOAuth)
 
 		t := template.Must(template.New("index.html").Funcs(funcMap).ParseFiles("./view/index.html"))
 		t.Execute(w, temp{
@@ -278,12 +275,14 @@ func userHandler(w http.ResponseWriter, r *http.Request) {
 
 	if login {
 		type temp struct {
-			User User
+			User      User
+			TimeZones timeZones
 		}
 
 		t, _ := template.ParseFiles("./view/user.html")
 		t.Execute(w, temp{
-			User: user,
+			User:      user,
+			TimeZones: getTimeZones(),
 		})
 	} else {
 		http.Redirect(w, r, "/login", 302)
@@ -300,14 +299,15 @@ func userChangeHandler(w http.ResponseWriter, r *http.Request) {
 
 	if login {
 		ytChannelID := r.FormValue("yt_channel_id")
+		timezone := r.FormValue("timezone")
 
-		err := clientVideo.DataBase.InsertUser(
+		err := clientVideo.dataBase.InsertUser(
 			ytChannelID,
 			user.TWChannelID,
 			user.TWOAuth,
 			user.UserName,
 			user.AvatarURL,
-			user.TimeZone,
+			timezone,
 			user.Crypt,
 			user.Date,
 		)
@@ -339,7 +339,7 @@ func runTime() {
 	var err error
 	run := true
 
-	users, err := clientVideo.DataBase.SelectUsers()
+	users, err := clientVideo.dataBase.SelectUsers()
 	if err != nil {
 		log.Println("ERR Users get: ", err)
 	}
@@ -361,7 +361,7 @@ func runTime() {
 		if time.Now().Minute()%30 == 0 && run {
 			log.Println("RUN groutine")
 			run = false
-			users, err = clientVideo.DataBase.SelectUsers()
+			users, err = clientVideo.dataBase.SelectUsers()
 			if err != nil {
 				log.Println("ERR Users get: ", err)
 			}
@@ -412,4 +412,22 @@ func cryptTest(username, hash string, dateChange time.Time) bool {
 
 func split(a, b int) bool {
 	return a%b == 0
+}
+
+func timeZone(t time.Time, tz string) (ttz time.Time) {
+	timezone, _ := time.LoadLocation(tz)
+	ttz = t.In(timezone)
+	return ttz
+}
+
+type timeZones []struct {
+	Offset int    `json:"offset"`
+	UTC    string `json:"utc"`
+}
+
+func getTimeZones() (timeZones timeZones) {
+	dat, _ := ioutil.ReadFile("timezones.json")
+	json.Unmarshal(dat, &timeZones)
+
+	return timeZones
 }

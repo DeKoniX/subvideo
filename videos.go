@@ -31,24 +31,24 @@ type ChannelOnline struct {
 }
 
 type ClientVideo struct {
-	client     *http.Client
-	twClientID string
-	TimeZone   *time.Location
-	DataBase   DB
+	client   *http.Client
+	dataBase DB
+	ytClient *youtube.Service
+	twClient TW
 }
 
-func InitClientVideo(twClientID, ytDeveloperKey string) (clientVideo ClientVideo) {
+func InitClientVideo(twClientID, twClientSecret, ytDeveloperKey string) (clientVideo ClientVideo) {
 	clientVideo.client = &http.Client{
 		Transport: &transport.APIKey{Key: ytDeveloperKey},
 	}
-	clientVideo.twClientID = twClientID
-	clientVideo.TimeZone, _ = time.LoadLocation("UTC")
+	clientVideo.twClient = TWInit(clientVideo.client, twClientID, twClientSecret)
+	clientVideo.ytClient, _ = youtube.New(clientVideo.client)
 
 	return clientVideo
 }
 
 func (clientVideo ClientVideo) SortVideo(user User, n int, channelID string) (subVideos []SubVideo, err error) {
-	subVideos, err = clientVideo.DataBase.SelectVideo(user.ID, n, channelID)
+	subVideos, err = clientVideo.dataBase.SelectVideo(user.ID, n, channelID)
 	if err != nil {
 		log.Fatal(err)
 		return subVideos, err
@@ -58,9 +58,9 @@ func (clientVideo ClientVideo) SortVideo(user User, n int, channelID string) (su
 }
 
 func (clientVideo ClientVideo) TWGetVideo(user User) (err error) {
-	videos := tw.GetVideos(user.TWOAuth)
+	videos := clientVideo.twClient.GetVideos(user.TWOAuth)
 	for _, video := range videos {
-		err = clientVideo.DataBase.InsertVideo(
+		err = clientVideo.dataBase.InsertVideo(
 			user.ID,
 			video.TypeSub,
 			video.Title,
@@ -70,7 +70,7 @@ func (clientVideo ClientVideo) TWGetVideo(user User) (err error) {
 			video.Description,
 			video.URL,
 			video.ThumbURL,
-			video.Date,
+			video.Date.UTC(),
 		)
 		if err != nil {
 			return err
@@ -85,8 +85,7 @@ func (clientVideo ClientVideo) YTGetVideo(user User) (err error) {
 		return nil
 	}
 
-	service, _ := youtube.New(clientVideo.client)
-	call := service.Subscriptions.List("snippet").
+	call := clientVideo.ytClient.Subscriptions.List("snippet").
 		ChannelId(user.YTChannelID).
 		MaxResults(50)
 	response, err := call.Do()
@@ -97,7 +96,7 @@ func (clientVideo ClientVideo) YTGetVideo(user User) (err error) {
 	for _, item := range response.Items {
 		channelID := item.Snippet.ResourceId.ChannelId
 
-		callVideo := service.Search.List("snippet").
+		callVideo := clientVideo.ytClient.Search.List("snippet").
 			Q("").
 			ChannelId(channelID).
 			MaxResults(5).
@@ -115,7 +114,7 @@ func (clientVideo ClientVideo) YTGetVideo(user User) (err error) {
 				return err
 			}
 
-			err = clientVideo.DataBase.InsertVideo(
+			err = clientVideo.dataBase.InsertVideo(
 				user.ID,
 				"youtube",
 				video.Snippet.Title,
@@ -125,7 +124,7 @@ func (clientVideo ClientVideo) YTGetVideo(user User) (err error) {
 				video.Snippet.Description,
 				"https://www.youtube.com/watch?v="+video.Id.VideoId,
 				video.Snippet.Thumbnails.High.Url,
-				ytTime.In(clientVideo.TimeZone),
+				ytTime.UTC(),
 			)
 			if err != nil {
 				return err
