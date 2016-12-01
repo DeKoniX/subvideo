@@ -37,7 +37,7 @@ func (tw TW) connect(url, oauth string) (body []byte) {
 	return body
 }
 
-func (tw TW) OAuthTest(oauth string) (user User, err error) {
+func (tw TW) OAuthTest(oauth string) (user User, _ error) {
 	body := tw.connect("user", oauth)
 
 	type twJSON struct {
@@ -74,7 +74,7 @@ func (tw TW) OAuthTest(oauth string) (user User, err error) {
 	}, nil
 }
 
-func (tw TW) Auth(code string) (oauth string) {
+func (tw TW) Auth(code string) string {
 	resp, _ := tw.HTTPClient.PostForm("https://api.twitch.tv/kraken/oauth2/token",
 		url.Values{
 			"client_id":     {tw.ClientID},

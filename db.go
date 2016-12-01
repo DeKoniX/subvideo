@@ -197,7 +197,7 @@ func (DataBase *DB) SelectUserForUserName(name string) (users []User, err error)
 	return users, nil
 }
 
-func (DataBase *DB) InsertVideo(userID int, typeSub, title, channel, channelID, game, description, url, thumbURL string, date time.Time) (err error) {
+func (DataBase *DB) InsertVideo(userID int, typeSub, title, channel, channelID, game, description, url, thumbURL string, date time.Time) error {
 	if DataBase.testItem(url, userID) == false {
 		tx, err := DataBase.db.Begin()
 		if err != nil {
@@ -254,6 +254,55 @@ func (DataBase *DB) SelectVideo(userID, n int, channelID string) (selectRows []S
 	}
 
 	return selectRows, nil
+}
+
+func (DataBase *DB) DeleteVideoWhereInterval(day int) (err error) {
+	duration := time.Hour * time.Duration(24*day)
+	dateInterval := time.Now().Add(-duration)
+	dateInterval.Format(time.RFC3339)
+	_, err = DataBase.db.Exec("DELETE FROM subvideo WHERE date<$1", dateInterval)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (DataBase *DB) DeleteUserWhereInterval(day int) (err error) {
+	duration := time.Hour * time.Duration(24*day)
+	dateInterval := time.Now().Add(-duration)
+	dateInterval.Format(time.RFC3339)
+
+	rows, err := DataBase.db.Query("SELECT id FROM users WHERE date_change<$1", dateInterval)
+	if err != nil {
+		return err
+	}
+	type usersID struct {
+		ID int
+	}
+	var users []usersID
+	for rows.Next() {
+		var id int
+		err = rows.Scan(&id)
+		if err != nil {
+			return err
+		}
+		users = append(users, usersID{ID: id})
+	}
+	rows.Close()
+
+	for _, id := range users {
+		_, err := DataBase.db.Exec("DELETE FROM subvideo WHERE user_id=$1", id.ID)
+		if err != nil {
+			return err
+		}
+		_, err = DataBase.db.Exec("DELETE FROM users WHERE id=$1", id.ID)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (DataBase *DB) testItem(url string, userID int) bool {

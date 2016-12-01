@@ -148,7 +148,7 @@ func twOAuthHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", 302)
 }
 
-func loginHandler(w http.ResponseWriter, r *http.Request) {
+func loginHandler(w http.ResponseWriter, _ *http.Request) {
 	type temp struct {
 		URL string
 	}
@@ -165,12 +165,12 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	t.Execute(w, temp{URL: u.String()})
 }
 
-func faviconHandler(w http.ResponseWriter, r *http.Request) {
+func faviconHandler(w http.ResponseWriter, _ *http.Request) {
 	file, _ := ioutil.ReadFile("view/favicon.png")
 	fmt.Fprint(w, string(file))
 }
 
-func currentUser(r *http.Request) (user User) {
+func currentUser(r *http.Request) (_ User) {
 	var username string
 	var hash string
 
@@ -373,6 +373,16 @@ func runTime() {
 				err = clientVideo.TWGetVideo(user)
 				if err != nil {
 					log.Println("ERR TW: ", err)
+				}
+			}
+			if time.Now().Minute() == 0 {
+				err = clientVideo.dataBase.DeleteVideoWhereInterval(10)
+				if err != nil {
+					log.Println("ERR Clear Video: ", err)
+				}
+				err = clientVideo.dataBase.DeleteUserWhereInterval(30)
+				if err != nil {
+					log.Println("ERR Clear Users: ", err)
 				}
 			}
 		} else {

@@ -26,3 +26,5 @@ _testmain.go
 *.yml
 
 *.db
+.idea/
+subvideo.iml
