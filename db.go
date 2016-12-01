@@ -44,6 +44,7 @@ func DBInit(host, port, username, password, dbname string) (DataBase DB, err err
         description text,
         url 				character varying(255),
         thumb_url   character varying(255),
+        length 			integer,
         date        timestamp with time zone,
 				user_id 		integer NOT NULL
 		);
@@ -197,20 +198,20 @@ func (DataBase *DB) SelectUserForUserName(name string) (users []User, err error)
 	return users, nil
 }
 
-func (DataBase *DB) InsertVideo(userID int, typeSub, title, channel, channelID, game, description, url, thumbURL string, date time.Time) error {
+func (DataBase *DB) InsertVideo(userID int, typeSub, title, channel, channelID, game, description, url, thumbURL string, length int, date time.Time) error {
 	if DataBase.testItem(url, userID) == false {
 		tx, err := DataBase.db.Begin()
 		if err != nil {
 			return err
 		}
 
-		stmt, err := tx.Prepare("INSERT INTO subvideo(type, title, channel, channel_id, game, description, url, thumb_url, date, user_id) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)")
+		stmt, err := tx.Prepare("INSERT INTO subvideo(type, title, channel, channel_id, game, description, url, thumb_url, length, date, user_id) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)")
 		if err != nil {
 			return err
 		}
 		defer stmt.Close()
 
-		_, err = stmt.Exec(typeSub, title, channel, channelID, game, description, url, thumbURL, date, userID)
+		_, err = stmt.Exec(typeSub, title, channel, channelID, game, description, url, thumbURL, length, date, userID)
 		if err != nil {
 			return err
 		}
@@ -223,9 +224,9 @@ func (DataBase *DB) InsertVideo(userID int, typeSub, title, channel, channelID, 
 func (DataBase *DB) SelectVideo(userID, n int, channelID string) (selectRows []SubVideo, err error) {
 	var rows *sql.Rows
 	if channelID == "" {
-		rows, err = DataBase.db.Query("SELECT type, title, channel, channel_id, game, description, url, thumb_url, date FROM subvideo WHERE user_id=$1 ORDER BY date DESC LIMIT $2", userID, n)
+		rows, err = DataBase.db.Query("SELECT type, title, channel, channel_id, game, description, url, thumb_url, length, date FROM subvideo WHERE user_id=$1 ORDER BY date DESC LIMIT $2", userID, n)
 	} else {
-		rows, err = DataBase.db.Query("SELECT type, title, channel, channel_id, game, description, url, thumb_url, date FROM subvideo WHERE user_id=$1 AND channel_id=$2 ORDER BY date DESC LIMIT $3", userID, channelID, n)
+		rows, err = DataBase.db.Query("SELECT type, title, channel, channel_id, game, description, url, thumb_url, length, date FROM subvideo WHERE user_id=$1 AND channel_id=$2 ORDER BY date DESC LIMIT $3", userID, channelID, n)
 	}
 
 	if err != nil {
@@ -235,8 +236,9 @@ func (DataBase *DB) SelectVideo(userID, n int, channelID string) (selectRows []S
 
 	for rows.Next() {
 		var typeSub, title, channel, channelID, game, description, url, thumbURL string
+		var length int
 		var date time.Time
-		err = rows.Scan(&typeSub, &title, &channel, &channelID, &game, &description, &url, &thumbURL, &date)
+		err = rows.Scan(&typeSub, &title, &channel, &channelID, &game, &description, &url, &thumbURL, &length, &date)
 		if err != nil {
 			return selectRows, err
 		}
@@ -246,9 +248,11 @@ func (DataBase *DB) SelectVideo(userID, n int, channelID string) (selectRows []S
 			Title:       title,
 			Channel:     channel,
 			ChannelID:   channelID,
+			Game:        game,
 			Description: description,
 			URL:         url,
 			ThumbURL:    thumbURL,
+			Length:      length,
 			Date:        date,
 		})
 	}

@@ -140,6 +140,7 @@ func (tw TW) GetVideos(oauth string) (videos []SubVideo) {
 			URL         string `json:"url"`
 			RecordedAt  string `json:"recorded_at"`
 			Game        string `json:"game"`
+			Length      int    `json:length`
 			Preview     string `json:"preview"`
 			Channel     struct {
 				Name        string `json:"name"`
@@ -156,18 +157,21 @@ func (tw TW) GetVideos(oauth string) (videos []SubVideo) {
 		if err != nil {
 			log.Panicln(err)
 		}
-		videos = append(videos, SubVideo{
-			TypeSub:     "twitch",
-			Title:       video.Title,
-			Channel:     video.Channel.DisplayName,
-			ChannelID:   video.Channel.Name,
-			Game:        video.Game,
-			Description: video.Description,
-			URL:         video.URL,
-			ThumbURL:    video.Preview,
-			Date:        twTime.UTC(),
-		})
-
+		if video.Length > 300 {
+			videos = append(videos, SubVideo{
+				TypeSub:     "twitch",
+				Title:       video.Title,
+				Channel:     video.Channel.DisplayName,
+				ChannelID:   video.Channel.Name,
+				Game:        video.Game,
+				Description: video.Description,
+				URL:         video.URL,
+				ThumbURL:    video.Preview,
+				Length:      video.Length,
+				Date:        twTime.UTC(),
+			})
+		}
 	}
+
 	return videos
 }

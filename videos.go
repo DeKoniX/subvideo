@@ -18,6 +18,7 @@ type SubVideo struct {
 	Description string
 	URL         string
 	ThumbURL    string
+	Length      int
 	Date        time.Time
 }
 
@@ -70,6 +71,7 @@ func (clientVideo ClientVideo) TWGetVideo(user User) (err error) {
 			video.Description,
 			video.URL,
 			video.ThumbURL,
+			video.Length,
 			video.Date.UTC(),
 		)
 		if err != nil {
@@ -124,6 +126,7 @@ func (clientVideo ClientVideo) YTGetVideo(user User) (err error) {
 				video.Snippet.Description,
 				"https://www.youtube.com/watch?v="+video.Id.VideoId,
 				video.Snippet.Thumbnails.High.Url,
+				1000,
 				ytTime.UTC(),
 			)
 			if err != nil {

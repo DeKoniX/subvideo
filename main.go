@@ -43,6 +43,7 @@ type configYML struct {
 var funcMap = template.FuncMap{
 	"split":    split,
 	"timeZone": timeZone,
+	"videoLen": videoLen,
 }
 
 var config configYML
@@ -215,7 +216,7 @@ func lastHandler(w http.ResponseWriter, r *http.Request) {
 			User      User
 		}
 
-		subVideos, err := clientVideo.SortVideo(user, 15, channelID)
+		subVideos, err := clientVideo.SortVideo(user, 42, channelID)
 		if len(subVideos) == 0 {
 			http.Redirect(w, r, "/", 302)
 		}
@@ -248,7 +249,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 			User          User
 		}
 
-		subVideos, err := clientVideo.SortVideo(user, 40, "")
+		subVideos, err := clientVideo.SortVideo(user, 42, "")
 		if err != nil {
 			log.Panicln(err)
 		}
@@ -440,4 +441,26 @@ func getTimeZones() (timeZones timeZones) {
 	json.Unmarshal(dat, &timeZones)
 
 	return timeZones
+}
+
+func videoLen(len int) (strLength string) {
+	var hour, min, second int
+	if len > 60 {
+		min = len / 60
+		second = len % 60
+
+		if min > 59 {
+			hour = min / 60
+			min = min % 60
+
+			strLength = fmt.Sprintf("Часов: %d, Минуты: %d, ", hour, min)
+		} else {
+			strLength = fmt.Sprintf("Минуты: %d, ", min)
+		}
+		strLength = strLength + fmt.Sprintf("Секунды: %d", second)
+	} else {
+		strLength = fmt.Sprintf("Секунды: %d", len)
+	}
+
+	return strLength
 }
