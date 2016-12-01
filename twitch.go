@@ -64,6 +64,7 @@ func (tw TW) OAuthTest(oauth string) (user User, _ error) {
 			TWChannelID: twjson.Name,
 			UserName:    twjson.DisplayName,
 			AvatarURL:   twjson.Logo,
+			TimeZone:    curUser[0].TimeZone,
 		}, nil
 	}
 	return User{
@@ -71,6 +72,7 @@ func (tw TW) OAuthTest(oauth string) (user User, _ error) {
 		TWChannelID: twjson.Name,
 		UserName:    twjson.DisplayName,
 		AvatarURL:   twjson.Logo,
+		TimeZone:    "UTC",
 	}, nil
 }
 

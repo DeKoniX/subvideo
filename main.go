@@ -120,7 +120,7 @@ func twOAuthHandler(w http.ResponseWriter, r *http.Request) {
 		oauth,
 		user.UserName,
 		user.AvatarURL,
-		"UTC",
+		user.TimeZone,
 		hash,
 		date,
 	)
