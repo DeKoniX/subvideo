@@ -62,6 +62,7 @@
             <h4>{{.Title}}</h4>
           </a>
           <h4>{{$channel.Game}}</h4>
+          <p>{{videoLen $channel.Length}}</p>
           <a href="{{.URL}}" class="btn btn-default">{{$channel.Channel}}</a>
           <button class="btn-btn-default jscopy right" id="copy-url"
                   data-clipboard-text="mpv --ytdl-format=High {{$channel.URL}}">

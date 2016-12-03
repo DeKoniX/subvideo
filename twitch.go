@@ -102,8 +102,9 @@ func (tw TW) GetOnline(oauth string) (videos []SubVideo) {
 
 	type jsonTW struct {
 		Streams []struct {
-			Game    string `json:"game"`
-			Preview struct {
+			Game      string `json:"game"`
+			CreatedAt string `json:"created_at"`
+			Preview   struct {
 				Large string `json:"large"`
 			}
 			Channel struct {
@@ -118,6 +119,10 @@ func (tw TW) GetOnline(oauth string) (videos []SubVideo) {
 	json.Unmarshal(body, &jsontw)
 
 	for _, stream := range jsontw.Streams {
+		twTime, err := time.Parse(time.RFC3339, stream.CreatedAt)
+		if err != nil {
+			twTime = time.Now()
+		}
 		videos = append(videos, SubVideo{
 			TypeSub:  "Online",
 			Title:    stream.Channel.Status,
@@ -125,6 +130,7 @@ func (tw TW) GetOnline(oauth string) (videos []SubVideo) {
 			Game:     stream.Game,
 			ThumbURL: stream.Preview.Large,
 			URL:      stream.Channel.URL,
+			Length:   getLength(twTime),
 		})
 	}
 	return videos
@@ -174,4 +180,8 @@ func (tw TW) GetVideos(oauth string) (videos []SubVideo) {
 	}
 
 	return videos
+}
+
+func getLength(timeStream time.Time) int {
+	return int(time.Now().Unix() - timeStream.Unix())
 }
