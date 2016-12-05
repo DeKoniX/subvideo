@@ -199,12 +199,12 @@ func (DataBase *DB) SelectUserForUserName(name string) (users []User, err error)
 }
 
 func (DataBase *DB) InsertVideo(userID int, typeSub, title, channel, channelID, game, description, url, thumbURL string, length int, date time.Time) error {
-	if DataBase.testItem(url, userID) == false {
-		tx, err := DataBase.db.Begin()
-		if err != nil {
-			return err
-		}
-
+	b, user := DataBase.testItem(url, userID)
+	tx, err := DataBase.db.Begin()
+	if err != nil {
+		return err
+	}
+	if b == false {
 		stmt, err := tx.Prepare("INSERT INTO subvideo(type, title, channel, channel_id, game, description, url, thumb_url, length, date, user_id) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)")
 		if err != nil {
 			return err
@@ -216,6 +216,24 @@ func (DataBase *DB) InsertVideo(userID int, typeSub, title, channel, channelID, 
 			return err
 		}
 		tx.Commit()
+	} else {
+		if user == userID {
+			stmt, err := tx.Prepare(`
+			UPDATE subvideo
+			SET title=$1 , game=$2, description=$3, thumb_url=$4, length=$5, date=$6
+			WHERE url=$7
+		`)
+			if err != nil {
+				return err
+			}
+			defer stmt.Close()
+
+			_, err = stmt.Exec(title, game, description, thumbURL, length, date.UTC(), url)
+			if err != nil {
+				return err
+			}
+			tx.Commit()
+		}
 	}
 
 	return nil
@@ -309,13 +327,14 @@ func (DataBase *DB) DeleteUserWhereInterval(day int) (err error) {
 	return nil
 }
 
-func (DataBase *DB) testItem(url string, userID int) bool {
-	var id int64
-	row := DataBase.db.QueryRow("SELECT id FROM subvideo WHERE url=$1 AND user_id=$2", url, userID)
-	err := row.Scan(&id)
+func (DataBase *DB) testItem(url string, userID int) (_ bool, user int) {
+	var id int
+
+	row := DataBase.db.QueryRow("SELECT id, user_id FROM subvideo WHERE url=$1 AND user_id=$2", url, userID)
+	err := row.Scan(&id, &user)
 	if err != nil {
-		return false
+		return false, userID
 	}
 
-	return true
+	return true, user
 }
