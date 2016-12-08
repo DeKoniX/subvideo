@@ -12,6 +12,8 @@ import (
 	"net/url"
 	"time"
 
+	"strconv"
+
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -31,13 +33,7 @@ type configYML struct {
 		UserName string
 		Password string
 	}
-	BasicAuth struct {
-		Username string
-		Password string
-	}
-	TimeZone struct {
-		Zone string
-	}
+	Secret string
 }
 
 var funcMap = template.FuncMap{
@@ -54,6 +50,7 @@ func main() {
 	if err != nil {
 		log.Panic(err)
 	}
+	log.Printf("\n%+v\n", config)
 
 	clientVideo = InitClientVideo(
 		config.Twitch.ClientID,
@@ -77,7 +74,7 @@ func main() {
 	http.Handle("/static/", http.StripPrefix("/static", fs))
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/last", lastHandler)
-	http.HandleFunc("/twitch/oauth", twOAuthHandler)
+	http.HandleFunc("/oauth/twitch", twOAuthHandler)
 	http.HandleFunc("/login", loginHandler)
 	http.HandleFunc("/user", userHandler)
 	http.HandleFunc("/user/change", userChangeHandler)
@@ -216,7 +213,7 @@ func lastHandler(w http.ResponseWriter, r *http.Request) {
 			User      User
 		}
 
-		subVideos, err := clientVideo.SortVideo(user, 42, channelID)
+		subVideos, err := clientVideo.SortVideo(user, 42, channelID, 0)
 		if len(subVideos) == 0 {
 			http.Redirect(w, r, "/", 302)
 		}
@@ -235,6 +232,15 @@ func lastHandler(w http.ResponseWriter, r *http.Request) {
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	var login bool
+	var page, pageNext, pageLast int
+
+	pageS := r.FormValue("page")
+	page, err := strconv.Atoi(pageS)
+	if err != nil || page == 0 {
+		page = 1
+	}
+	pageNext = page + 1
+	pageLast = page - 1
 
 	user := currentUser(r)
 	if user.UserName != "" {
@@ -243,13 +249,19 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 
 	if login {
 		clientVideo.twClient.GetOnline(user.TWOAuth)
+		type pageStruct struct {
+			Page int
+			Next int
+			Last int
+		}
 		type temp struct {
 			SubVideos     []SubVideo
 			ChannelOnline []SubVideo
 			User          User
+			Page          pageStruct
 		}
 
-		subVideos, err := clientVideo.SortVideo(user, 42, "")
+		subVideos, err := clientVideo.SortVideo(user, 42, "", page)
 		if err != nil {
 			log.Panicln(err)
 		}
@@ -260,6 +272,11 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 			SubVideos:     subVideos,
 			ChannelOnline: channelOnline,
 			User:          user,
+			Page: pageStruct{
+				Page: page,
+				Next: pageNext,
+				Last: pageLast,
+			},
 		})
 	} else {
 		http.Redirect(w, r, "/login", 302)
@@ -409,6 +426,7 @@ func getConfig() (err error) {
 func crypt(username string, dateChange time.Time) string {
 	h := md5.New()
 	io.WriteString(h, username)
+	io.WriteString(h, config.Secret)
 	io.WriteString(h, dateChange.Format(time.Stamp))
 	return fmt.Sprintf("%x", h.Sum(nil))
 }
@@ -416,6 +434,7 @@ func crypt(username string, dateChange time.Time) string {
 func cryptTest(username, hash string, dateChange time.Time) bool {
 	h := md5.New()
 	io.WriteString(h, username)
+	io.WriteString(h, config.Secret)
 	io.WriteString(h, dateChange.Format(time.Stamp))
 	thisHash := fmt.Sprintf("%x", h.Sum(nil))
 	return thisHash == hash

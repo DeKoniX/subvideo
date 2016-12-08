@@ -48,8 +48,8 @@ func InitClientVideo(twClientID, twClientSecret, ytDeveloperKey string) (clientV
 	return clientVideo
 }
 
-func (clientVideo ClientVideo) SortVideo(user User, n int, channelID string) (subVideos []SubVideo, err error) {
-	subVideos, err = clientVideo.dataBase.SelectVideo(user.ID, n, channelID)
+func (clientVideo ClientVideo) SortVideo(user User, n int, channelID string, page int) (subVideos []SubVideo, err error) {
+	subVideos, err = clientVideo.dataBase.SelectVideo(user.ID, n, channelID, page)
 	if err != nil {
 		log.Fatal(err)
 		return subVideos, err
