@@ -1,11 +1,13 @@
 youtube:
   developerkey:
-  mychannelid:
 twitch:
   clientid:
-  mychannelname:
-basicauth:
-  username: username
-  password: password
-timezone:
-  zone: UTC
+  clientsecret:
+  redirecturi: http://localhost:8181/oauth/twitch
+database:
+  host: localhost
+  port: 5432
+  dbname: subvideo
+  username: postgresql
+  password:
+secret: ThisIsSecret

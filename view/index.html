@@ -54,16 +54,16 @@
     {{end}}
     <div class="col-md-6">
       <div class="thumbnail">
-        <a href="{{$channel.URL}}">
+        <a href="{{$channel.URL}}" target="_blank">
           <img src="{{$channel.ThumbURL}}" alt="{{$channel.Title}}"/>
         </a>
         <div class="caption">
-          <a href="{{$channel.URL}}">
+          <a href="{{$channel.URL}}" target="_blank">
             <h4>{{.Title}}</h4>
           </a>
           <h4>{{$channel.Game}}</h4>
           <p>{{videoLen $channel.Length}}</p>
-          <a href="{{.URL}}" class="btn btn-default">{{$channel.Channel}}</a>
+          <a href="{{.URL}}" class="btn btn-default" target="_blank">{{$channel.Channel}}</a>
           <button class="btn-btn-default jscopy right" id="copy-url"
                   data-clipboard-text="mpv --ytdl-format=High {{$channel.URL}}">
             <span class="glyphicon glyphicon-copy" aria-hidden="true"></span>
@@ -91,17 +91,17 @@
     {{end}}
     <div class="col-xs-12 col-sm-6 col-md-4">
       <div class="thumbnail">
-        <a href="{{.URL}}">
+        <a href="{{.URL}}" target="_blank">
           <img src="{{.ThumbURL}}" alt="{{.Title}}"/>
         </a>
         <div class="caption">
           {{if eq .TypeSub "youtube"}}
-          <a href="{{.URL}}">
+          <a href="{{.URL}}" target="_blank">
             <h4><img src="/static/ytube.png" alt="YouTube"/> {{.Title}}
             </h4>
           </a>
           {{else}}
-          <a href="{{.URL}}">
+          <a href="{{.URL}}" target="_blank">
             <h4><img src="/static/twitch.png" alt="Twitch"/> {{.Title}}
             </h4>
           </a>
@@ -117,13 +117,13 @@
             </button>
             <ul class="dropdown-menu">
               <li>{{if eq .TypeSub "youtube"}}
-                <a href="https://www.youtube.com/channel/{{.ChannelID}}"><img src="/static/ytube.png"
-                                                                              alt="YouTube"
-                                                                              id="channelTitle"/>
+                <a href="https://www.youtube.com/channel/{{.ChannelID}}" target="_blank"><img src="/static/ytube.png"
+                                                                                              alt="YouTube"
+                                                                                              id="channelTitle"/>
                   {{.Channel}}</a>
                 {{else}}
-                <a href="https://www.twitch.tv/{{.ChannelID}}"><img src="/static/twitch.png"
-                                                                    alt="Twitch" id="channelTitle"/>
+                <a href="https://www.twitch.tv/{{.ChannelID}}" target="_blank"><img src="/static/twitch.png"
+                                                                                    alt="Twitch" id="channelTitle"/>
                   {{.Channel}}</a>
                 {{end}}
               </li>

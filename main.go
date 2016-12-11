@@ -50,7 +50,6 @@ func main() {
 	if err != nil {
 		log.Panic(err)
 	}
-	log.Printf("\n%+v\n", config)
 
 	clientVideo = InitClientVideo(
 		config.Twitch.ClientID,
