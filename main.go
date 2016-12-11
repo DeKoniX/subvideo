@@ -443,10 +443,11 @@ func split(a, b int) bool {
 	return a%b == 0
 }
 
-func timeZone(t time.Time, tz string) (ttz time.Time) {
+func timeZone(t time.Time, tz string) (timeString string) {
 	timezone, _ := time.LoadLocation(tz)
-	ttz = t.In(timezone)
-	return ttz
+	ttz := t.In(timezone)
+	timeString = ttz.Format("02-01-06 ------ 15:04")
+	return timeString
 }
 
 type timeZones []struct {
