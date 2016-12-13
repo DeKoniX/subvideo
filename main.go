@@ -105,7 +105,7 @@ func twOAuthHandler(w http.ResponseWriter, r *http.Request) {
 	oauth := clientVideo.twClient.Auth(code)
 	user, err := clientVideo.twClient.OAuthTest(oauth)
 	if err != nil {
-		log.Panicln(err)
+		log.Println(err)
 		http.Redirect(w, r, "/login", 302)
 	}
 	date := time.Now().UTC()
@@ -197,24 +197,35 @@ func currentUser(r *http.Request) (_ User) {
 }
 
 func lastHandler(w http.ResponseWriter, r *http.Request) {
-	var login bool
+	var page, pageNext, pageLast int
+
+	pageS := r.FormValue("page")
+	page, err := strconv.Atoi(pageS)
+	if err != nil || page == 0 {
+		page = 1
+	}
+	pageNext = page + 1
+	pageLast = page - 1
 
 	channelID := r.FormValue("channelID")
 
 	user := currentUser(r)
-	if user.UserName != "" {
-		login = true
-	}
 
-	if login {
+	if user.UserName != "" {
+		type pageStruct struct {
+			Page int
+			Next int
+			Last int
+		}
 		type temp struct {
 			SubVideos []SubVideo
 			User      User
+			Page      pageStruct
 		}
 
-		subVideos, err := clientVideo.SortVideo(user, 42, channelID, 0)
+		subVideos, err := clientVideo.SortVideo(user, 42, channelID, page)
 		if len(subVideos) == 0 {
-			http.Redirect(w, r, "/", 302)
+			http.Redirect(w, r, "/last?channelID="+channelID+"&page="+strconv.Itoa(pageLast), 302)
 		}
 		if err != nil {
 			log.Panicln(err)
@@ -223,6 +234,11 @@ func lastHandler(w http.ResponseWriter, r *http.Request) {
 		t.Execute(w, temp{
 			SubVideos: subVideos,
 			User:      user,
+			Page: pageStruct{
+				Page: page,
+				Next: pageNext,
+				Last: pageLast,
+			},
 		})
 	} else {
 		http.Redirect(w, r, "/login", 302)
@@ -230,7 +246,6 @@ func lastHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-	var login bool
 	var page, pageNext, pageLast int
 
 	pageS := r.FormValue("page")
@@ -242,11 +257,8 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	pageLast = page - 1
 
 	user := currentUser(r)
-	if user.UserName != "" {
-		login = true
-	}
 
-	if login {
+	if user.UserName != "" {
 		clientVideo.twClient.GetOnline(user.TWOAuth)
 		type pageStruct struct {
 			Page int

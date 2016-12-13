@@ -48,6 +48,16 @@
 </nav>
 <div class="container">
   <h2>Последние видео {{ $channel := index .SubVideos 0}}{{ $channel.Channel }}</h2>
+  <nav aria-label="...">
+    <ul class="pager">
+      {{ if eq .Page.Last 0 }}
+      <li class="previous disabled"><a href="#"><span aria-hidden="true">&larr;</span></a></li>
+      {{ else }}
+      <li class="previous"><a href="/last?channelID={{ $channel.ChannelID }}&page={{ .Page.Last }}"><span aria-hidden="true">&larr;</span></a></li>
+      {{ end }}
+      <li class="next"><a href="/last?channelID={{ $channel.ChannelID }}&page={{ .Page.Next }}"><span aria-hidden="true">&rarr;</span></a></li>
+    </ul>
+  </nav>
   <div class="row">
     {{range $index, $ := .SubVideos}} {{if split $index 3}}
     <div class="clearfix hidden-xs"></div>
@@ -91,6 +101,16 @@
     </div>
     {{end}}
   </div>
+  <nav aria-label="...">
+    <ul class="pager">
+      {{ if eq .Page.Last 0 }}
+      <li class="previous disabled"><a href="#"><span aria-hidden="true">&larr;</span></a></li>
+      {{ else }}
+      <li class="previous"><a href="/last?channelID={{ $channel.ChannelID }}&page={{ .Page.Last }}"><span aria-hidden="true">&larr;</span></a></li>
+      {{ end }}
+      <li class="next"><a href="/last?channelID={{ $channel.ChannelID }}&page={{ .Page.Next }}"><span aria-hidden="true">&rarr;</span></a></li>
+    </ul>
+  </nav>
 </div>
 <div class="scrollup">
   <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>

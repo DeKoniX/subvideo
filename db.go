@@ -244,7 +244,7 @@ func (DataBase *DB) SelectVideo(userID, n int, channelID string, page int) (sele
 	if channelID == "" {
 		rows, err = DataBase.db.Query("SELECT type, title, channel, channel_id, game, description, url, thumb_url, length, date FROM subvideo WHERE user_id=$1 ORDER BY date DESC LIMIT $2 OFFSET $3", userID, n, page*n-n)
 	} else {
-		rows, err = DataBase.db.Query("SELECT type, title, channel, channel_id, game, description, url, thumb_url, length, date FROM subvideo WHERE user_id=$1 AND channel_id=$2 ORDER BY date DESC LIMIT $3", userID, channelID, n)
+		rows, err = DataBase.db.Query("SELECT type, title, channel, channel_id, game, description, url, thumb_url, length, date FROM subvideo WHERE user_id=$1 AND channel_id=$2 ORDER BY date DESC LIMIT $3 OFFSET $4", userID, channelID, n, page*n-n)
 	}
 
 	if err != nil {
