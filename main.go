@@ -19,21 +19,22 @@ import (
 
 type configYML struct {
 	YouTube struct {
-		DeveloperKey string
+		DeveloperKey string `yaml:"developerkey"`
 	}
 	Twitch struct {
-		ClientID     string
-		ClientSecret string
-		RedirectURI  string
+		ClientID     string `yaml:"clientid"`
+		ClientSecret string `yaml:"clientsecret"`
+		RedirectURI  string `yaml:"redirecturi"`
 	}
 	DataBase struct {
-		Host     string
-		Port     string
-		DBname   string
-		UserName string
-		Password string
+		Host     string `yaml:"host"`
+		Port     string `yaml:"port"`
+		DBname   string `yaml:"dbname"`
+		UserName string `yaml:"username"`
+		Password string `yaml:"password"`
 	}
-	Secret string
+	Secret  string `yaml:"secret"`
+	HeadURL string `yaml:"headurl"`
 }
 
 var funcMap = template.FuncMap{
@@ -78,7 +79,7 @@ func main() {
 	http.HandleFunc("/user", userHandler)
 	http.HandleFunc("/user/change", userChangeHandler)
 	http.HandleFunc("/logout", logoutHandler)
-	http.HandleFunc("/favicon.png", faviconHandler)
+	http.HandleFunc("/favicon.ico", faviconHandler)
 
 	log.Println("Listen server: :8181")
 	log.Fatal(http.ListenAndServe(":8181", nil))
@@ -147,7 +148,8 @@ func twOAuthHandler(w http.ResponseWriter, r *http.Request) {
 
 func loginHandler(w http.ResponseWriter, _ *http.Request) {
 	type temp struct {
-		URL string
+		HeadURL string
+		URL     string
 	}
 
 	u, _ := url.Parse("https://api.twitch.tv/kraken/oauth2/authorize")
@@ -159,11 +161,11 @@ func loginHandler(w http.ResponseWriter, _ *http.Request) {
 	u.RawQuery = q.Encode()
 
 	t, _ := template.ParseFiles("./view/login.html")
-	t.Execute(w, temp{URL: u.String()})
+	t.Execute(w, temp{HeadURL: config.HeadURL, URL: u.String()})
 }
 
 func faviconHandler(w http.ResponseWriter, _ *http.Request) {
-	file, _ := ioutil.ReadFile("view/favicon.png")
+	file, _ := ioutil.ReadFile("view/favicon.ico")
 	fmt.Fprint(w, string(file))
 }
 

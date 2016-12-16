@@ -4,26 +4,36 @@
 <head>
   <meta charset="utf-8">
   <title>SubVideo</title>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+  <meta name="description" content="Привет, я могу проверить что же появилось нового на Twitch и YouTube"/>
+  <meta property="og:url" content="https://habrahabr.ru/company/JetBrains/blog/317716/"/>
+  <meta property="og:title" content="SubVideo"/>
+  <meta property="og:image" content="{{ .HeadURL }}static/tea.png"/>
+  <link rel="image_src" href="{{ .HeadURL }}static/tea.png"/>
+  <meta property="og:description" content="Привет, я могу проверить что же появилось нового на Twitch и YouTube"/>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+        integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
   <link rel="stylesheet" type="text/css" href="/static/index.css">
   <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+          integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+          crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.13/clipboard.min.js"></script>
-  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="icon" type="image/png" href="/favicon.ico"/>
 </head>
 
 <body>
-  <div class="container">
-    <div class="jumbotron">
-      <h1>Привет!</h1>
-      <p>Привет и Добро пожаловать в неведумую хрень, для доступа нужно залогиниться через Twitch!</p>
-      <p><a class="btn btn-primary btn-lg" href="{{.URL}}" role="button">Залогиниться</a></p>
-    </div>
+<div class="container">
+  <div class="jumbotron">
+    <h1>Приветствую вас на SubVideo!</h1>
+    <p>Привет, я могу проверить что же появилось нового на Twitch и YouTube</p>
+    <p><a class="btn btn-primary btn-lg" href="{{.URL}}" role="button">Войти через Twitch</a></p>
   </div>
-  <div class="scrollup">
-    <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
-  </div>
+</div>
+<div class="scrollup">
+  <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
+</div>
 </body>
 <script type="text/javascript" src="/static/index.js"></script>
 
