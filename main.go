@@ -212,12 +212,14 @@ func lastHandler(w http.ResponseWriter, r *http.Request) {
 	user := currentUser(r)
 
 	if user.UserName != "" {
+		var title string
 		type pageStruct struct {
 			Page int
 			Next int
 			Last int
 		}
 		type temp struct {
+			Title     string
 			SubVideos []SubVideo
 			User      User
 			Page      pageStruct
@@ -230,8 +232,10 @@ func lastHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Panicln(err)
 		}
+		title = fmt.Sprintf("%s последние видео", subVideos[0].Channel)
 		t := template.Must(template.New("last.html").Funcs(funcMap).ParseFiles("./view/last.html"))
 		t.Execute(w, temp{
+			Title:     title,
 			SubVideos: subVideos,
 			User:      user,
 			Page: pageStruct{
@@ -259,6 +263,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	user := currentUser(r)
 
 	if user.UserName != "" {
+		var title string
 		clientVideo.twClient.GetOnline(user.TWOAuth)
 		type pageStruct struct {
 			Page int
@@ -266,6 +271,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 			Last int
 		}
 		type temp struct {
+			Title         string
 			SubVideos     []SubVideo
 			ChannelOnline []SubVideo
 			User          User
@@ -277,9 +283,21 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 			log.Panicln(err)
 		}
 		channelOnline := clientVideo.twClient.GetOnline(user.TWOAuth)
+		switch len(channelOnline) {
+		case 1:
+			title = fmt.Sprintf("сейчас идет %d стрим", len(channelOnline))
+		case 2, 3, 4:
+			title = fmt.Sprintf("сейчас идет %d стрима", len(channelOnline))
+		default:
+			title = fmt.Sprintf("сейчас идет %d стримов", len(channelOnline))
+		}
+		if page != 1 {
+			title += fmt.Sprintf(", страница %d", page)
+		}
 
 		t := template.Must(template.New("index.html").Funcs(funcMap).ParseFiles("./view/index.html"))
 		t.Execute(w, temp{
+			Title:         title,
 			SubVideos:     subVideos,
 			ChannelOnline: channelOnline,
 			User:          user,
@@ -295,21 +313,20 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func userHandler(w http.ResponseWriter, r *http.Request) {
-	var login bool
-
 	user := currentUser(r)
-	if user.UserName != "" {
-		login = true
-	}
 
-	if login {
+	if user.UserName != "" {
+		var title string
 		type temp struct {
+			Title     string
 			User      User
 			TimeZones timeZones
 		}
 
+		title = fmt.Sprintf("Настройки пользователя %s", user.UserName)
 		t, _ := template.ParseFiles("./view/user.html")
 		t.Execute(w, temp{
+			Title:     title,
 			User:      user,
 			TimeZones: getTimeZones(),
 		})
