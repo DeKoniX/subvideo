@@ -230,6 +230,7 @@ func lastHandler(w http.ResponseWriter, r *http.Request) {
 		subVideos, err := clientVideo.SortVideo(user, 42, channelID, page)
 		if len(subVideos) == 0 {
 			http.Redirect(w, r, "/last?channelID="+channelID+"&page="+strconv.Itoa(pageLast), 302)
+			return
 		}
 		if err != nil {
 			log.Panicln(err)
@@ -248,6 +249,7 @@ func lastHandler(w http.ResponseWriter, r *http.Request) {
 		})
 	} else {
 		http.Redirect(w, r, "/login", 302)
+		return
 	}
 }
 
@@ -311,6 +313,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		})
 	} else {
 		http.Redirect(w, r, "/login", 302)
+		return
 	}
 }
 

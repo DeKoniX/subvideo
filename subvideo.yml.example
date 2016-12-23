@@ -11,3 +11,4 @@ database:
   username: postgresql
   password:
 secret: ThisIsSecret
+headurl: http://localhost:8181/
