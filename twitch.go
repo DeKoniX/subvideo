@@ -110,6 +110,7 @@ func (tw TW) GetOnline(oauth string) (videos []SubVideo) {
 			Channel struct {
 				Status      string `json:"status"`
 				DisplayName string `json:"display_name"`
+				Name        string `json:"name"`
 				URL         string `json:"url"`
 			}
 		}
@@ -124,13 +125,14 @@ func (tw TW) GetOnline(oauth string) (videos []SubVideo) {
 			twTime = time.Now()
 		}
 		videos = append(videos, SubVideo{
-			TypeSub:  "Online",
-			Title:    stream.Channel.Status,
-			Channel:  stream.Channel.DisplayName,
-			Game:     stream.Game,
-			ThumbURL: stream.Preview.Large,
-			URL:      stream.Channel.URL,
-			Length:   getLength(twTime),
+			TypeSub:   "Online",
+			Title:     stream.Channel.Status,
+			Channel:   stream.Channel.DisplayName,
+			ChannelID: stream.Channel.Name,
+			Game:      stream.Game,
+			ThumbURL:  stream.Preview.Large,
+			URL:       stream.Channel.URL,
+			Length:    getLength(twTime),
 		})
 	}
 	return videos

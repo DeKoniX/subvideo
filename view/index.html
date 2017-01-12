@@ -63,7 +63,23 @@
           </a>
           <h4>{{$channel.Game}}</h4>
           <p>{{videoLen $channel.Length}}</p>
-          <a href="{{.URL}}" class="btn btn-default" target="_blank">{{$channel.Channel}}</a>
+
+          <div class="btn-group">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                    area-haspopup="true" area-expanded="false">
+              {{$channel.Channel}} <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+              <li>
+                <a href="https://www.twitch.tv/{{$channel.ChannelID}}" target="_blank"><img src="/static/twitch.png"
+                                                                                            alt="Twitch"
+                                                                                            id="channelTitle"/>
+                  {{$channel.Channel}}</a>
+              </li>
+              <li><a href="/last?channelID={{$channel.ChannelID}}">Последние видео</a></li>
+            </ul>
+          </div>
+
           <button class="btn-btn-default jscopy right" id="copy-url"
                   data-clipboard-text="mpv --ytdl-format=High {{$channel.URL}}">
             <span class="glyphicon glyphicon-copy" aria-hidden="true"></span>
