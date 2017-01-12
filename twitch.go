@@ -137,7 +137,7 @@ func (tw TW) GetOnline(oauth string) (videos []SubVideo) {
 }
 
 func (tw TW) GetVideos(oauth string) (videos []SubVideo) {
-	body := tw.connect("/videos/followed?limit=20&broadcast_type=all", oauth)
+	body := tw.connect("videos/followed?limit=20&broadcast_type=all", oauth)
 
 	type jsonTW struct {
 		Videos []struct {

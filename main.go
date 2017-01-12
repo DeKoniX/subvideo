@@ -268,7 +268,6 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 
 	if user.UserName != "" {
 		var title string
-		clientVideo.twClient.GetOnline(user.TWOAuth)
 		type pageStruct struct {
 			Page int
 			Next int
