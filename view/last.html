@@ -81,8 +81,8 @@
             </h4>
           </a>
           <h4>{{.Game}}</h4>
-          <p>{{videoLen .Length}}</p>
           {{end}}
+          <p>{{videoLen .Length}}</p>
           <p>{{.Description}}</p>
           <p>{{ timeZone .Date $userTimeZone}}</p>
           {{if eq .TypeSub "youtube"}}

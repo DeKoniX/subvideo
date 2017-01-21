@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"google.golang.org/api/googleapi/transport"
@@ -96,22 +97,36 @@ func (clientVideo ClientVideo) YTGetVideo(user User) (err error) {
 	}
 
 	for _, item := range response.Items {
+		var ids string
 		channelID := item.Snippet.ResourceId.ChannelId
 
-		callVideo := clientVideo.ytClient.Search.List("snippet").
+		callSearchVideos := clientVideo.ytClient.Search.List("snippet").
 			Q("").
 			ChannelId(channelID).
 			MaxResults(5).
 			Order("date").
 			Type("video")
 
-		responseVideo, err := callVideo.Do()
+		responseSearchVideos, err := callSearchVideos.Do()
 		if err != nil {
 			return err
 		}
 
-		for _, video := range responseVideo.Items {
+		for _, videoSearch := range responseSearchVideos.Items {
+			ids += videoSearch.Id.VideoId + ","
+		}
+		callVideos := clientVideo.ytClient.Videos.List("snippet,contentDetails").Id(ids)
+		responseVideos, err := callVideos.Do()
+		if err != nil {
+			return err
+		}
+
+		for _, video := range responseVideos.Items {
 			ytTime, err := time.Parse(time.RFC3339, video.Snippet.PublishedAt)
+			if err != nil {
+				return err
+			}
+			durationVideo, err := time.ParseDuration(strings.ToLower(video.ContentDetails.Duration[2:]))
 			if err != nil {
 				return err
 			}
@@ -124,14 +139,15 @@ func (clientVideo ClientVideo) YTGetVideo(user User) (err error) {
 				video.Snippet.ChannelId,
 				"",
 				video.Snippet.Description,
-				"https://www.youtube.com/watch?v="+video.Id.VideoId,
+				"https://www.youtube.com/watch?v="+video.Id,
 				video.Snippet.Thumbnails.High.Url,
-				1000,
+				int(durationVideo.Seconds()),
 				ytTime.UTC(),
 			)
 			if err != nil {
 				return err
 			}
+
 		}
 	}
 
