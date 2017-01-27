@@ -47,58 +47,17 @@
   </div>
 </nav>
 <div class="container">
-  <h2>Сейчас идут стримы!</h2>
-  <div class="row">
-    {{range $index, $channel := .ChannelOnline}} {{if split $index 2}}
-    <div class="clearfix hidden-xs"></div>
-    {{end}}
-    <div class="col-md-6">
-      <div class="thumbnail">
-        <a href="{{$channel.URL}}" target="_blank">
-          <img src="{{$channel.ThumbURL}}" alt="{{$channel.Title}}"/>
-        </a>
-        <div class="caption">
-          <a href="{{$channel.URL}}" target="_blank">
-            <h4>{{.Title}}</h4>
-          </a>
-          <h4 class="game-name">{{$channel.Game}}</h4>
-          <p class="video-len">{{videoLen $channel.Length}}</p>
-
-          <div class="btn-group">
-            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
-                    area-haspopup="true" area-expanded="false">
-              {{$channel.Channel}} <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu">
-              <li>
-                <a href="https://www.twitch.tv/{{$channel.ChannelID}}" target="_blank"><img src="/static/twitch.png"
-                                                                                            alt="Twitch"
-                                                                                            id="channelTitle"/>
-                  {{$channel.Channel}}</a>
-              </li>
-              <li><a href="/last?channelID={{$channel.ChannelID}}">Последние видео</a></li>
-            </ul>
-          </div>
-
-          <button class="btn-btn-default jscopy right" id="copy-url"
-                  data-clipboard-text="mpv --ytdl-format=High {{$channel.URL}}">
-            <span class="glyphicon glyphicon-copy" aria-hidden="true"></span>
-          </button>
-        </div>
-      </div>
-    </div>
-    {{end}}
-  </div>
-  <hr>
-  <h2>Что новенького?</h2>
+  <h2>Последние видео {{ $channel := index .SubVideos 0}}{{ $channel.Channel }}</h2>
   <nav aria-label="...">
     <ul class="pager">
       {{ if eq .Page.Last 0 }}
       <li class="previous disabled"><a href="#"><span aria-hidden="true">&larr;</span></a></li>
       {{ else }}
-      <li class="previous"><a href="/?page={{ .Page.Last }}"><span aria-hidden="true">&larr;</span></a></li>
+      <li class="previous"><a href="/last?channelID={{ $channel.ChannelID }}&page={{ .Page.Last }}"><span
+              aria-hidden="true">&larr;</span></a></li>
       {{ end }}
-      <li class="next"><a href="/?page={{ .Page.Next }}"><span aria-hidden="true">&rarr;</span></a></li>
+      <li class="next"><a href="/last?channelID={{ $channel.ChannelID }}&page={{ .Page.Next }}"><span
+              aria-hidden="true">&rarr;</span></a></li>
     </ul>
   </nav>
   <div class="row">
@@ -126,32 +85,15 @@
           <p>{{videoLen .Length}}</p>
           <p>{{.Description}}</p>
           <p>{{ timeZone .Date $userTimeZone}}</p>
-          <div class="btn-group">
-            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
-                    area-haspopup="true" area-expanded="false">
-              {{.Channel}} <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu">
-              <li>{{if eq .TypeSub "youtube"}}
-                <a href="https://www.youtube.com/channel/{{.ChannelID}}" target="_blank"><img src="/static/ytube.png"
-                                                                                              alt="YouTube"
-                                                                                              id="channelTitle"/>
-                  {{.Channel}}</a>
-                {{else}}
-                <a href="https://www.twitch.tv/{{.ChannelID}}" target="_blank"><img src="/static/twitch.png"
-                                                                                    alt="Twitch" id="channelTitle"/>
-                  {{.Channel}}</a>
-                {{end}}
-              </li>
-              <li><a href="/last?channelID={{.ChannelID}}">Последние видео</a></li>
-            </ul>
-          </div>
-          {{ if eq .TypeSub "youtube" }}
+          {{if eq .TypeSub "youtube"}}
+          <a href="https://www.youtube.com/channel/{{.ChannelID}}" class="btn btn-default"
+             target="_blank">{{.Channel}}</a>
           <button class="btn-btn-default jscopy right" id="copy-url"
                   data-clipboard-text="mpv --ytdl-format=136+bestaudio {{.URL}}">
             <span class="glyphicon glyphicon-copy" aria-hidden="true"></span>
           </button>
           {{else}}
+          <a href="https://www.twitch.tv/{{.ChannelID}}" class="btn btn-default" target="_blank">{{.Channel}}</a>
           <button class="btn-btn-default jscopy right" id="copy-url"
                   data-clipboard-text="mpv --ytdl-format=High {{.URL}}">
             <span class="glyphicon glyphicon-copy" aria-hidden="true"></span>
@@ -167,9 +109,11 @@
       {{ if eq .Page.Last 0 }}
       <li class="previous disabled"><a href="#"><span aria-hidden="true">&larr;</span></a></li>
       {{ else }}
-      <li class="previous"><a href="/?page={{ .Page.Last }}"><span aria-hidden="true">&larr;</span></a></li>
+      <li class="previous"><a href="/last?channelID={{ $channel.ChannelID }}&page={{ .Page.Last }}"><span
+              aria-hidden="true">&larr;</span></a></li>
       {{ end }}
-      <li class="next"><a href="/?page={{ .Page.Next }}"><span aria-hidden="true">&rarr;</span></a></li>
+      <li class="next"><a href="/last?channelID={{ $channel.ChannelID }}&page={{ .Page.Next }}"><span
+              aria-hidden="true">&rarr;</span></a></li>
     </ul>
   </nav>
 </div>
