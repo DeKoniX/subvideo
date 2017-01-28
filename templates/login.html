@@ -7,14 +7,14 @@
   <meta name="description" content="Привет, я могу проверить что же появилось нового на Twitch и YouTube"/>
   <meta property="og:url" content="https://habrahabr.ru/company/JetBrains/blog/317716/"/>
   <meta property="og:title" content="SubVideo"/>
-  <meta property="og:image" content="{{ .HeadURL }}static/tea.png"/>
-  <link rel="image_src" href="{{ .HeadURL }}static/tea.png"/>
+  <meta property="og:image" content="{{ .HeadURL }}tea.png"/>
+  <link rel="image_src" href="{{ .HeadURL }}tea.png"/>
   <meta property="og:description" content="Привет, я могу проверить что же появилось нового на Twitch и YouTube"/>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
         integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
         integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-  <link rel="stylesheet" type="text/css" href="/static/index.css">
+  {{stylesheet_tag "main"}}
   <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
           integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
@@ -35,6 +35,6 @@
   <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
 </div>
 </body>
-<script type="text/javascript" src="/static/index.js"></script>
+{{javascript_tag "main"}}
 
 </html>

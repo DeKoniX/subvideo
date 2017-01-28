@@ -6,7 +6,7 @@
   <title>{{ .Title }} | SubVideo</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-  <link rel="stylesheet" type="text/css" href="/static/index.css">
+  {{stylesheet_tag "main"}}
   <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.13/clipboard.min.js"></script>
@@ -41,7 +41,7 @@
     </div>
   </nav>
   <div class="container">
-    <form action="/user/change" method="post">
+    <form action="/user" method="post">
       <div class="form-group">
         <label for="yt_channel_id">Ваш YouTube ID канала</label>
         <input type="text" name="yt_channel_id" value="{{.User.YTChannelID}}" class="form-control" placeholder="Введите ваш ID канала на YouTube">
@@ -64,8 +64,8 @@
         <h3 class="panel-title">Как получить свой YouTube ID</h3>
       </div>
       <div class="panel-body">
-        <video src="/static/videosub.mov" controls>
-          <source src="/static/videosub.webm" type="video/webm">
+        <video src="/videosub.mov" controls>
+          <source src="/videosub.webm" type="video/webm">
         </video>
 
       </div>
@@ -75,6 +75,6 @@
     <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
   </div>
 </body>
-<script type="text/javascript" src="/static/index.js"></script>
+{{javascript_tag "main"}}
 
 </html>

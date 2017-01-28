@@ -12,6 +12,10 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/go-macaron/binding"
+	"github.com/go-macaron/gzip"
+	"github.com/shaoshing/train"
+
 	"strconv"
 
 	macaron "gopkg.in/macaron.v1"
@@ -38,14 +42,13 @@ type configYML struct {
 	HeadURL string `yaml:"headurl"`
 }
 
-// var funcMap = template.FuncMap{
-// 	"split":    split,
-// 	"timeZone": timeZone,
-// 	"videoLen": videoLen,
-// }
-
 var config configYML
 var clientVideo ClientVideo
+
+type ChangeUserForm struct {
+	YtChannelID string `form:"yt_channel_id" binding:"Required"`
+	TimeZone    string `form:"timezone" binding:"Required"`
+}
 
 func main() {
 	err := getConfig()
@@ -74,73 +77,50 @@ func main() {
 	m := macaron.Classic()
 	m.Use(macaron.Renderer(macaron.RenderOptions{
 		Funcs: []template.FuncMap{map[string]interface{}{
-			"split":    split,
-			"timeZone": timeZone,
-			"videoLen": videoLen,
+			"javascript_tag":            train.JavascriptTag,
+			"stylesheet_tag":            train.StylesheetTag,
+			"stylesheet_tag_with_param": train.StylesheetTagWithParam,
+			"split":                     split,
+			"timeZone":                  timeZone,
+			"videoLen":                  videoLen,
 		}},
 	}))
+	m.Use(macaron.Static("public"))
+	m.Use(gzip.Gziper())
 
 	m.Get("/", indexHandler)
 	m.Get("/last", lastHandler)
 	m.Get("/oauth/twitch", twOAuthHandler)
 	m.Get("/login", loginHandler)
-	m.Get("/user", userHandler)
-	m.Post("/user/change", userChangeHandler)
 	m.Get("/logout", logoutHandler)
-	// m.Get("/favicon.ico", faviconHandler)
+	m.Combo("/user").
+		Get(userHandler).
+		Post(binding.Bind(ChangeUserForm{}), userChangeHandler)
 
 	mux := http.NewServeMux()
 	mux.Handle("/", m)
 	mux.Handle("/last", m)
 	mux.Handle("/login", m)
 	mux.Handle("/user", m)
+	train.ConfigureHttpHandler(mux)
 
 	log.Println("Server is running...")
 	log.Println(http.ListenAndServe(":8181", mux))
-
-	// fs := http.FileServer(http.Dir("./view/static"))
-	// http.Handle("/static/", http.StripPrefix("/static", fs))
-	// http.HandleFunc("/", indexHandler)
-	// http.HandleFunc("/last", lastHandler)
-	// http.HandleFunc("/oauth/twitch", twOAuthHandler)
-	// http.HandleFunc("/login", loginHandler)
-	// http.HandleFunc("/user", userHandler)
-	// http.HandleFunc("/user/change", userChangeHandler)
-	// http.HandleFunc("/logout", logoutHandler)
-	// http.HandleFunc("/favicon.ico", faviconHandler)
-
-	// log.Println("Listen server: :8181")
-	// log.Fatal(http.ListenAndServe(":8181", nil))
 }
 
 func logoutHandler(ctx *macaron.Context) {
-	// http.SetCookie(w, &http.Cookie{
-	// 	Name:   "username",
-	// 	Value:  "",
-	// 	MaxAge: -1,
-	// 	Path:   "/",
-	// })
-	// http.SetCookie(w, &http.Cookie{
-	// 	Name:   "crypt",
-	// 	Value:  "",
-	// 	MaxAge: -1,
-	// 	Path:   "/",
-	// })
-	// http.Redirect(w, r, "/", 302)
 	ctx.SetCookie("username", "", -1)
 	ctx.SetCookie("crypt", "", -1)
 	ctx.Redirect("/")
 }
 
 func twOAuthHandler(ctx *macaron.Context) {
-	// code := r.FormValue("code")
-	code := ctx.Req.FormValue("code")
+	code := ctx.Query("code")
 	oauth := clientVideo.twClient.Auth(code)
 	user, err := clientVideo.twClient.OAuthTest(oauth)
 	if err != nil {
 		log.Println(err)
 		ctx.Redirect("/login")
-		// http.Redirect(w, r, "/login", 302)
 	}
 	date := time.Now().UTC()
 	hash := crypt(user.UserName, date)
@@ -164,30 +144,12 @@ func twOAuthHandler(ctx *macaron.Context) {
 	}
 	go runUser(users[0])
 
-	// http.SetCookie(w, &http.Cookie{
-	// 	Name:    "username",
-	// 	Value:   user.UserName,
-	// 	Expires: time.Now().Add(time.Hour * 24 * 30),
-	// 	Path:    "/",
-	// })
-	// http.SetCookie(w, &http.Cookie{
-	// 	Name:    "crypt",
-	// 	Value:   hash,
-	// 	Expires: time.Now().Add(time.Hour * 24 * 30),
-	// 	Path:    "/",
-	// })
-	// http.Redirect(w, r, "/", 302)
 	ctx.SetCookie("username", user.UserName, time.Now().Add(time.Hour*24*30))
 	ctx.SetCookie("crypt", hash, time.Now().Add(time.Hour*24*30))
 	ctx.Redirect("/")
 }
 
 func loginHandler(ctx *macaron.Context) {
-	type temp struct {
-		HeadURL string
-		URL     string
-	}
-
 	u, _ := url.Parse("https://api.twitch.tv/kraken/oauth2/authorize")
 	q := u.Query()
 	q.Set("response_type", "code")
@@ -198,29 +160,10 @@ func loginHandler(ctx *macaron.Context) {
 
 	ctx.Data["HeadURL"] = config.HeadURL
 	ctx.Data["URL"] = u.String()
-	// ctx.Data["temp"] = temp{HeadURL: config.HeadURL, URL: u.String()}
 	ctx.HTML(200, "login")
-	// t, _ := template.ParseFiles("./view/login.html")
-	// t.Execute(w, temp{HeadURL: config.HeadURL, URL: u.String()})
 }
 
-// func faviconHandler(ctx *macaron.Context) {
-// 	file, _ := ioutil.ReadFile("view/favicon.ico")
-// 	fmt.Fprint(w, string(file))
-// }
-
 func currentUser(username, hash string) User {
-	// var username string
-	// var hash string
-
-	// for _, cookie := range r.Cookies() {
-	// 	if cookie.Name == "username" {
-	// 		username = cookie.Value
-	// 	}
-	// 	if cookie.Name == "crypt" {
-	// 		hash = cookie.Value
-	// 	}
-	// }
 	if username == "" {
 		return User{}
 	}
@@ -260,17 +203,14 @@ func lastHandler(ctx *macaron.Context) {
 			Next int
 			Last int
 		}
-		// type temp struct {
-		// 	Title     string
-		// 	SubVideos []SubVideo
-		// 	User      User
-		// 	Page      pageStruct
-		// }
 
 		subVideos, err := clientVideo.SortVideo(user, 42, channelID, page)
 		if len(subVideos) == 0 {
+			if pageLast == 0 {
+				ctx.Redirect("/")
+				return
+			}
 			ctx.Redirect("/last?channelID=" + channelID + "&page=" + strconv.Itoa(pageLast))
-			// http.Redirect(w, r, "/last?channelID="+channelID+"&page="+strconv.Itoa(pageLast), 302)
 			return
 		}
 		if err != nil {
@@ -287,21 +227,8 @@ func lastHandler(ctx *macaron.Context) {
 			Last: pageLast,
 		}
 		ctx.HTML(200, "last")
-
-		// t := template.Must(template.New("last.html").Funcs(funcMap).ParseFiles("./view/last.html"))
-		// t.Execute(w, temp{
-		// 	Title:     title,
-		// 	SubVideos: subVideos,
-		// 	User:      user,
-		// 	Page: pageStruct{
-		// 		Page: page,
-		// 		Next: pageNext,
-		// 		Last: pageLast,
-		// 	},
-		// })
 	} else {
 		ctx.Redirect("/login")
-		// http.Redirect(w, r, "/login", 302)
 		return
 	}
 }
@@ -326,13 +253,6 @@ func indexHandler(ctx *macaron.Context) {
 			Next int
 			Last int
 		}
-		// type temp struct {
-		// 	Title         string
-		// 	SubVideos     []SubVideo
-		// 	ChannelOnline []SubVideo
-		// 	User          User
-		// 	Page          pageStruct
-		// }
 
 		subVideos, err := clientVideo.SortVideo(user, 42, "", page)
 		if err != nil {
@@ -362,21 +282,7 @@ func indexHandler(ctx *macaron.Context) {
 		}
 
 		ctx.HTML(200, "index")
-
-		// t := template.Must(template.New("index.html").Funcs(funcMap).ParseFiles("./view/index.html"))
-		// t.Execute(w, temp{
-		// 	Title:         title,
-		// 	SubVideos:     subVideos,
-		// 	ChannelOnline: channelOnline,
-		// 	User:          user,
-		// 	Page: pageStruct{
-		// 		Page: page,
-		// 		Next: pageNext,
-		// 		Last: pageLast,
-		// 	},
-		// })
 	} else {
-		// http.Redirect(w, r, "/login", 302)
 		ctx.Redirect("/login")
 		return
 	}
@@ -387,30 +293,18 @@ func userHandler(ctx *macaron.Context) {
 
 	if user.UserName != "" {
 		var title string
-		// type temp struct {
-		// 	Title     string
-		// 	User      User
-		// 	TimeZones timeZones
-		// }
 
 		title = fmt.Sprintf("Настройки пользователя %s", user.UserName)
 		ctx.Data["Title"] = title
 		ctx.Data["User"] = user
 		ctx.Data["TimeZones"] = getTimeZones()
 		ctx.HTML(200, "user")
-		// t, _ := template.ParseFiles("./view/user.html")
-		// t.Execute(w, temp{
-		// 	Title:     title,
-		// 	User:      user,
-		// 	TimeZones: getTimeZones(),
-		// })
 	} else {
 		ctx.Redirect("/login")
-		// http.Redirect(w, r, "/login", 302)
 	}
 }
 
-func userChangeHandler(ctx *macaron.Context) {
+func userChangeHandler(ctx *macaron.Context, changeUserForm ChangeUserForm) {
 	var login bool
 
 	user := currentUser(ctx.GetCookie("username"), ctx.GetCookie("crypt"))
@@ -419,8 +313,10 @@ func userChangeHandler(ctx *macaron.Context) {
 	}
 
 	if login {
-		ytChannelID := ctx.Req.FormValue("yt_channel_id")
-		timezone := ctx.Req.FormValue("timezone")
+		ytChannelID := changeUserForm.YtChannelID
+		timezone := changeUserForm.TimeZone
+		// ytChannelID := ctx.Req.FormValue("yt_channel_id")
+		// timezone := ctx.Req.FormValue("timezone")
 
 		err := clientVideo.dataBase.InsertUser(
 			ytChannelID,
@@ -436,13 +332,11 @@ func userChangeHandler(ctx *macaron.Context) {
 			log.Panic(err)
 		}
 
-		user = currentUser("", "")
+		user = currentUser(ctx.GetCookie("username"), ctx.GetCookie("crypt"))
 		go runUser(user)
 		ctx.Redirect("/")
-		// http.Redirect(w, r, "/", 302)
 	} else {
-		ctx.Redirect("/")
-		// http.Redirect(w, r, "/login", 302)
+		ctx.Redirect("/login")
 	}
 }
 

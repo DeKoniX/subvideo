@@ -8,7 +8,7 @@
         integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
         integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-  <link rel="stylesheet" type="text/css" href="/static/index.css">
+  {{stylesheet_tag "main"}}
   <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
           integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
@@ -71,7 +71,7 @@
             </button>
             <ul class="dropdown-menu">
               <li>
-                <a href="https://www.twitch.tv/{{$channel.ChannelID}}" target="_blank"><img src="/static/twitch.png"
+                <a href="https://www.twitch.tv/{{$channel.ChannelID}}" target="_blank"><img src="/twitch.png"
                                                                                             alt="Twitch"
                                                                                             id="channelTitle"/>
                   {{$channel.Channel}}</a>
@@ -113,12 +113,12 @@
         <div class="caption">
           {{if eq .TypeSub "youtube"}}
           <a href="{{.URL}}" target="_blank">
-            <h4><img src="/static/ytube.png" alt="YouTube"/> {{.Title}}
+            <h4><img src="/ytube.png" alt="YouTube"/> {{.Title}}
             </h4>
           </a>
           {{else}}
           <a href="{{.URL}}" target="_blank">
-            <h4><img src="/static/twitch.png" alt="Twitch"/> {{.Title}}
+            <h4><img src="/twitch.png" alt="Twitch"/> {{.Title}}
             </h4>
           </a>
           <h4>{{.Game}}</h4>
@@ -133,12 +133,12 @@
             </button>
             <ul class="dropdown-menu">
               <li>{{if eq .TypeSub "youtube"}}
-                <a href="https://www.youtube.com/channel/{{.ChannelID}}" target="_blank"><img src="/static/ytube.png"
+                <a href="https://www.youtube.com/channel/{{.ChannelID}}" target="_blank"><img src="/ytube.png"
                                                                                               alt="YouTube"
                                                                                               id="channelTitle"/>
                   {{.Channel}}</a>
                 {{else}}
-                <a href="https://www.twitch.tv/{{.ChannelID}}" target="_blank"><img src="/static/twitch.png"
+                <a href="https://www.twitch.tv/{{.ChannelID}}" target="_blank"><img src="/twitch.png"
                                                                                     alt="Twitch" id="channelTitle"/>
                   {{.Channel}}</a>
                 {{end}}
@@ -177,6 +177,6 @@
   <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
 </div>
 </body>
-<script type="text/javascript" src="/static/index.js"></script>
+{{javascript_tag "main"}}
 
 </html>
