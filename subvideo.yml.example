@@ -12,3 +12,5 @@ database:
   password:
 secret: ThisIsSecret
 headurl: http://localhost:8181/
+delete_video_interval: 10
+delete_user_interval: 30

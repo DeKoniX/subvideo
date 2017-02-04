@@ -1,182 +1,79 @@
 <!DOCTYPE html>
 <html>
-
-<head>
-  <meta charset="utf-8">
-  <title>{{ .Title }} | SubVideo</title>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
-        integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-  {{stylesheet_tag "main"}}
-  <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
-          integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-          crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.13/clipboard.min.js"></script>
-  <link rel="icon" type="image/png" href="/favicon.ico"/>
-</head>
+{{ template "layouts/head" .Title }}
 
 <body>
-{{$userTimeZone := .User.TimeZone}}
-<nav class="navbar navbar-default">
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse"
-              aria-expanded="false">
-        <span class="sr-only">Свернуть</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <a class="navbar-brand" href="/">VideoSUB</a>
-    </div>
+    {{ $userTimeZone := .User.TimeZone }} {{ template "layouts/navigation" .User}}
+    <div class="container">
+        <h2>Сейчас идут стримы!</h2>
+        <div class="row">
+            {{ range $index, $channel := .ChannelOnline }} {{ if split $index 2 }}
+            <div class="clearfix hidden-xs"></div>
+            {{ end }}
+            <div class="col-md-6">
+                <div class="thumbnail">
+                    <a href="{{$channel.URL}}" target="_blank">
+                        <img src="{{$channel.ThumbURL}}" alt="{{$channel.Title}}" />
+                    </a>
+                    <div class="caption">
+                        <a href="{{$channel.URL}}" target="_blank">
+                            <h4>{{ .Title }}</h4>
+                        </a>
+                        <h4>{{ $channel.Game }}</h4>
+                        <p>{{ videoLen $channel.Length }}</p>
 
-    <div class="collapse navbar-collapse" id="navbar-collapse">
-      <ul class="nav navbar-nav navbar-right">
-        {{ if ne .User.AvatarURL "" }}
-        <li class="hidden-xs">
-          <img src="{{.User.AvatarURL}}" alt="{{.User.UserName}}" width="45px" height="45px">
-        </li>
-        {{ end }}
-        <li><a href="/user">Настройки</a></li>
-        <li><a href="/logout">Выход</a></li>
-      </ul>
-    </div>
-
-  </div>
-</nav>
-<div class="container">
-  <h2>Сейчас идут стримы!</h2>
-  <div class="row">
-    {{range $index, $channel := .ChannelOnline}} {{if split $index 2}}
-    <div class="clearfix hidden-xs"></div>
-    {{end}}
-    <div class="col-md-6">
-      <div class="thumbnail">
-        <a href="{{$channel.URL}}" target="_blank">
-          <img src="{{$channel.ThumbURL}}" alt="{{$channel.Title}}"/>
-        </a>
-        <div class="caption">
-          <a href="{{$channel.URL}}" target="_blank">
-            <h4>{{.Title}}</h4>
-          </a>
-          <h4>{{$channel.Game}}</h4>
-          <p>{{videoLen $channel.Length}}</p>
-
-          <div class="btn-group">
-            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
-                    area-haspopup="true" area-expanded="false">
-              {{$channel.Channel}} <span class="caret"></span>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" area-haspopup="true" area-expanded="false">
+              {{ $channel.Channel }} <span class="caret"></span>
             </button>
-            <ul class="dropdown-menu">
-              <li>
-                <a href="https://www.twitch.tv/{{$channel.ChannelID}}" target="_blank"><img src="/twitch.png"
-                                                                                            alt="Twitch"
-                                                                                            id="channelTitle"/>
-                  {{$channel.Channel}}</a>
-              </li>
-              <li><a href="/last?channelID={{$channel.ChannelID}}">Последние видео</a></li>
-            </ul>
-          </div>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="https://www.twitch.tv/{{$channel.ChannelID}}" target="_blank"><img src="/twitch.png" alt="Twitch" id="channelTitle" /> {{ $channel.Channel }}</a>
+                                </li>
+                                <li><a href="/last?channelID={{$channel.ChannelID}}">Последние видео</a></li>
+                            </ul>
+                        </div>
 
-          <button class="btn-btn-default jscopy right" id="copy-url"
-                  data-clipboard-text="mpv --ytdl-format=High {{$channel.URL}}">
+                        <button class="btn-btn-default jscopy right" id="copy-url" data-clipboard-text="mpv --ytdl-format=High {{$channel.URL}}">
             <span class="glyphicon glyphicon-copy" aria-hidden="true"></span>
           </button>
+                    </div>
+                </div>
+            </div>
+            {{ end }}
         </div>
-      </div>
-    </div>
-    {{end}}
-  </div>
-  <hr>
-  <h2>Что новенького?</h2>
-  <nav aria-label="...">
-    <ul class="pager">
-      {{ if eq .Page.Last 0 }}
-      <li class="previous disabled"><a href="#"><span aria-hidden="true">&larr;</span></a></li>
-      {{ else }}
-      <li class="previous"><a href="/?page={{ .Page.Last }}"><span aria-hidden="true">&larr;</span></a></li>
-      {{ end }}
-      <li class="next"><a href="/?page={{ .Page.Next }}"><span aria-hidden="true">&rarr;</span></a></li>
-    </ul>
-  </nav>
-  <div class="row">
-    {{range $index, $ := .SubVideos}} {{if split $index 3}}
-    <div class="clearfix hidden-xs"></div>
-    {{end}}
-    <div class="col-xs-12 col-sm-6 col-md-4">
-      <div class="thumbnail">
-        <a href="{{.URL}}" target="_blank">
-          <img src="{{.ThumbURL}}" alt="{{.Title}}"/>
-        </a>
-        <div class="caption">
-          {{if eq .TypeSub "youtube"}}
-          <a href="{{.URL}}" target="_blank">
-            <h4><img src="/ytube.png" alt="YouTube"/> {{.Title}}
-            </h4>
-          </a>
-          {{else}}
-          <a href="{{.URL}}" target="_blank">
-            <h4><img src="/twitch.png" alt="Twitch"/> {{.Title}}
-            </h4>
-          </a>
-          <h4>{{.Game}}</h4>
-          {{end}}
-          <p>{{videoLen .Length}}</p>
-          <p id="description">{{.Description}}</p>
-          <p>{{ timeZone .Date $userTimeZone}}</p>
-          <div class="btn-group">
-            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
-                    area-haspopup="true" area-expanded="false">
-              {{.Channel}} <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu">
-              <li>{{if eq .TypeSub "youtube"}}
-                <a href="https://www.youtube.com/channel/{{.ChannelID}}" target="_blank"><img src="/ytube.png"
-                                                                                              alt="YouTube"
-                                                                                              id="channelTitle"/>
-                  {{.Channel}}</a>
-                {{else}}
-                <a href="https://www.twitch.tv/{{.ChannelID}}" target="_blank"><img src="/twitch.png"
-                                                                                    alt="Twitch" id="channelTitle"/>
-                  {{.Channel}}</a>
-                {{end}}
-              </li>
-              <li><a href="/last?channelID={{.ChannelID}}">Последние видео</a></li>
+        <hr>
+        <h2>Что новенького?</h2>
+        <nav aria-label="...">
+            <ul class="pager">
+                {{ if eq .Page.Last 0 }}
+                <li class="previous disabled"><a href="#"><span aria-hidden="true">&larr;</span></a></li>
+                {{ else }}
+                <li class="previous"><a href="/?page={{ .Page.Last }}"><span aria-hidden="true">&larr;</span></a></li>
+                {{ end }}
+                <li class="next"><a href="/?page={{ .Page.Next }}"><span aria-hidden="true">&rarr;</span></a></li>
             </ul>
-          </div>
-          {{ if eq .TypeSub "youtube" }}
-          <button class="btn-btn-default jscopy right" id="copy-url"
-                  data-clipboard-text="mpv --ytdl-format=136+bestaudio {{.URL}}">
-            <span class="glyphicon glyphicon-copy" aria-hidden="true"></span>
-          </button>
-          {{else}}
-          <button class="btn-btn-default jscopy right" id="copy-url"
-                  data-clipboard-text="mpv --ytdl-format=High {{.URL}}">
-            <span class="glyphicon glyphicon-copy" aria-hidden="true"></span>
-          </button>
-          {{end}}
+        </nav>
+        <div class="row">
+            {{ range $index, $ := .SubVideos }} {{ if split $index 3 }}
+            <div class="clearfix hidden-xs"></div>
+            {{ end }} {{ template "video" . }} {{ end }}
         </div>
-      </div>
+        <nav aria-label="...">
+            <ul class="pager">
+                {{ if eq .Page.Last 0 }}
+                <li class="previous disabled"><a href="#"><span aria-hidden="true">&larr;</span></a></li>
+                {{ else }}
+                <li class="previous"><a href="/?page={{ .Page.Last }}"><span aria-hidden="true">&larr;</span></a></li>
+                {{ end }}
+                <li class="next"><a href="/?page={{ .Page.Next }}"><span aria-hidden="true">&rarr;</span></a></li>
+            </ul>
+        </nav>
     </div>
-    {{end}}
-  </div>
-  <nav aria-label="...">
-    <ul class="pager">
-      {{ if eq .Page.Last 0 }}
-      <li class="previous disabled"><a href="#"><span aria-hidden="true">&larr;</span></a></li>
-      {{ else }}
-      <li class="previous"><a href="/?page={{ .Page.Last }}"><span aria-hidden="true">&larr;</span></a></li>
-      {{ end }}
-      <li class="next"><a href="/?page={{ .Page.Next }}"><span aria-hidden="true">&rarr;</span></a></li>
-    </ul>
-  </nav>
-</div>
-<div class="scrollup">
-  <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
-</div>
+    <div class="scrollup">
+        <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
+    </div>
 </body>
-{{javascript_tag "main"}}
+{{ javascript_tag "main" }}
 
 </html>
