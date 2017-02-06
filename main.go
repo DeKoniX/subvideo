@@ -9,7 +9,6 @@ import (
 
 	"github.com/go-macaron/binding"
 	"github.com/go-macaron/gzip"
-	"github.com/shaoshing/train"
 
 	macaron "gopkg.in/macaron.v1"
 	yaml "gopkg.in/yaml.v2"
@@ -67,12 +66,9 @@ func main() {
 	m := macaron.Classic()
 	m.Use(macaron.Renderer(macaron.RenderOptions{
 		Funcs: []template.FuncMap{map[string]interface{}{
-			"javascript_tag":            train.JavascriptTag,
-			"stylesheet_tag":            train.StylesheetTag,
-			"stylesheet_tag_with_param": train.StylesheetTagWithParam,
-			"split":                     split,
-			"getTime":                   getTime,
-			"videoLen":                  videoLen,
+			"split":    split,
+			"getTime":  getTime,
+			"videoLen": videoLen,
 		}},
 	}))
 	m.Use(macaron.Static("public"))
@@ -87,15 +83,8 @@ func main() {
 		Get(userHandler).
 		Post(binding.Bind(ChangeUserForm{}), userChangeHandler)
 
-	mux := http.NewServeMux()
-	mux.Handle("/", m)
-	mux.Handle("/last", m)
-	mux.Handle("/login", m)
-	mux.Handle("/user", m)
-	train.ConfigureHttpHandler(mux)
-
 	log.Println("Server is running...")
-	log.Println(http.ListenAndServe(":8181", mux))
+	log.Println(http.ListenAndServe(":8181", m))
 }
 
 func runUser(user User) {

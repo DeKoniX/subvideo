@@ -28,3 +28,5 @@ _testmain.go
 *.db
 .idea/
 subvideo.iml
+node_modules/
+tmp/
