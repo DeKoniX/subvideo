@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"net/url"
 	"time"
+
+	"github.com/DeKoniX/subvideo/models"
 )
 
 type TW struct {
@@ -37,7 +39,7 @@ func (tw TW) connect(url, oauth string) (body []byte) {
 	return body
 }
 
-func (tw TW) OAuthTest(oauth string) (user User, _ error) {
+func (tw TW) OAuthTest(oauth string) (user models.User, err error) {
 	body := tw.connect("user", oauth)
 
 	type twJSON struct {
@@ -56,24 +58,11 @@ func (tw TW) OAuthTest(oauth string) (user User, _ error) {
 		return user, fmt.Errorf("ERR Twitch API: %s, %s", twjson.Error, twjson.Message)
 	}
 
-	curUser, _ := clientVideo.dataBase.SelectUserForUserName(twjson.DisplayName)
-
-	if len(curUser) > 0 {
-		return User{
-			YTChannelID: curUser[0].YTChannelID,
-			TWChannelID: twjson.Name,
-			UserName:    twjson.DisplayName,
-			AvatarURL:   twjson.Logo,
-			TimeZone:    curUser[0].TimeZone,
-		}, nil
-	}
-	return User{
-		YTChannelID: "",
-		TWChannelID: twjson.Name,
-		UserName:    twjson.DisplayName,
-		AvatarURL:   twjson.Logo,
-		TimeZone:    "UTC",
-	}, nil
+	curUser, _ := models.SelectUserForUserName(twjson.DisplayName)
+	curUser.TWChannelID = twjson.Name
+	curUser.UserName = twjson.DisplayName
+	curUser.AvatarURL = twjson.Logo
+	return curUser, nil
 }
 
 func (tw TW) Auth(code string) string {
@@ -97,7 +86,7 @@ func (tw TW) Auth(code string) string {
 	return jsontw.AccessToken
 }
 
-func (tw TW) GetOnline(oauth string) (videos []SubVideo) {
+func (tw TW) GetOnline(oauth string) (videos []models.Subvideo) {
 	body := tw.connect("streams/followed?limit=50&stream_type=live", oauth)
 
 	type jsonTW struct {
@@ -124,7 +113,7 @@ func (tw TW) GetOnline(oauth string) (videos []SubVideo) {
 		if err != nil {
 			twTime = time.Now()
 		}
-		videos = append(videos, SubVideo{
+		videos = append(videos, models.Subvideo{
 			TypeSub:   "Online",
 			Title:     stream.Channel.Status,
 			Channel:   stream.Channel.DisplayName,
@@ -138,7 +127,7 @@ func (tw TW) GetOnline(oauth string) (videos []SubVideo) {
 	return videos
 }
 
-func (tw TW) GetVideos(oauth string) (videos []SubVideo) {
+func (tw TW) GetVideos(oauth string) (videos []models.Subvideo) {
 	body := tw.connect("videos/followed?limit=20&broadcast_type=all", oauth)
 
 	type jsonTW struct {
@@ -166,7 +155,7 @@ func (tw TW) GetVideos(oauth string) (videos []SubVideo) {
 			log.Panicln(err)
 		}
 		if video.Length > 300 {
-			videos = append(videos, SubVideo{
+			videos = append(videos, models.Subvideo{
 				TypeSub:     "twitch",
 				Title:       video.Title,
 				Channel:     video.Channel.DisplayName,

@@ -7,24 +7,22 @@ import (
 	"io"
 	"io/ioutil"
 	"time"
+
+	"github.com/DeKoniX/subvideo/models"
 )
 
-func currentUser(username, hash string) User {
+func currentUser(username, hash string) (user models.User) {
 	if username == "" {
-		return User{}
+		return user
 	}
-	users, err := clientVideo.dataBase.SelectUserForUserName(username)
+	user, err := models.SelectUserForUserName(username)
 	if err != nil {
-		return User{}
+		return models.User{}
 	}
-	if len(users) == 0 {
-		return User{}
+	if cryptTest(username, hash, user.UpdatedAt.UTC()) {
+		return user
 	}
-
-	if cryptTest(username, hash, users[0].Date.UTC()) {
-		return users[0]
-	}
-	return User{}
+	return models.User{}
 }
 
 func split(a, b int) bool {

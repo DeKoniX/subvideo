@@ -7,6 +7,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/DeKoniX/subvideo/models"
+
 	macaron "gopkg.in/macaron.v1"
 )
 
@@ -26,30 +28,25 @@ func twOAuthHandler(ctx *macaron.Context) {
 	oauth := clientVideo.twClient.Auth(code)
 	user, err := clientVideo.twClient.OAuthTest(oauth)
 	if err != nil {
-		log.Println(err)
+		log.Println("ERR OAUTH Twitch:", err)
 		ctx.Redirect("/login")
 	}
-	date := time.Now().UTC()
-	hash := crypt(user.UserName, date)
+	timeNow := time.Now().UTC()
+	hash := crypt(user.UserName, timeNow)
 
-	err = clientVideo.dataBase.InsertUser(
-		user.YTChannelID,
-		user.TWChannelID,
-		oauth,
-		user.UserName,
-		user.AvatarURL,
-		user.TimeZone,
-		hash,
-		date,
-	)
+	user.TWOAuth = oauth
+	user.Crypt = hash
+	user.UpdatedAt = timeNow
+
+	err = user.Insert()
 	if err != nil {
 		log.Panic(err)
 	}
-	users, err := clientVideo.dataBase.SelectUserForUserName(user.UserName)
+	user, err = models.SelectUserForUserName(user.UserName)
 	if err != nil {
 		log.Panic(err)
 	}
-	go runUser(users[0])
+	go runUser(user)
 
 	ctx.SetCookie("username", user.UserName, time.Now().Add(time.Hour*24*30))
 	ctx.SetCookie("crypt", hash, time.Now().Add(time.Hour*24*30))
@@ -197,7 +194,7 @@ func userHandler(ctx *macaron.Context) {
 }
 
 func userChangeHandler(ctx *macaron.Context, changeUserForm ChangeUserForm) {
-	var login bool
+	login := false
 
 	user := currentUser(ctx.GetCookie("username"), ctx.GetCookie("crypt"))
 	if user.UserName != "" {
@@ -207,19 +204,10 @@ func userChangeHandler(ctx *macaron.Context, changeUserForm ChangeUserForm) {
 	if login {
 		ytChannelID := changeUserForm.YtChannelID
 		timezone := changeUserForm.TimeZone
-		// ytChannelID := ctx.Req.FormValue("yt_channel_id")
-		// timezone := ctx.Req.FormValue("timezone")
 
-		err := clientVideo.dataBase.InsertUser(
-			ytChannelID,
-			user.TWChannelID,
-			user.TWOAuth,
-			user.UserName,
-			user.AvatarURL,
-			timezone,
-			user.Crypt,
-			user.Date,
-		)
+		user.YTChannelID = ytChannelID
+		user.TimeZone = timezone
+		err := user.Insert()
 		if err != nil {
 			log.Panic(err)
 		}

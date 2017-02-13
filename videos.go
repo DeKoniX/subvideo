@@ -1,27 +1,15 @@
 package main
 
 import (
-	"log"
 	"net/http"
 	"strings"
 	"time"
 
+	"github.com/DeKoniX/subvideo/models"
+
 	"google.golang.org/api/googleapi/transport"
 	youtube "google.golang.org/api/youtube/v3"
 )
-
-type SubVideo struct {
-	TypeSub     string
-	Title       string
-	Channel     string
-	ChannelID   string
-	Game        string
-	Description string
-	URL         string
-	ThumbURL    string
-	Length      int
-	Date        time.Time
-}
 
 type ChannelOnline struct {
 	Title     string
@@ -34,7 +22,6 @@ type ChannelOnline struct {
 
 type ClientVideo struct {
 	client   *http.Client
-	dataBase DB
 	ytClient *youtube.Service
 	twClient TW
 }
@@ -49,41 +36,26 @@ func InitClientVideo(twClientID, twClientSecret, ytDeveloperKey string) (clientV
 	return clientVideo
 }
 
-func (clientVideo ClientVideo) SortVideo(user User, n int, channelID string, page int) (subVideos []SubVideo, err error) {
-	subVideos, err = clientVideo.dataBase.SelectVideo(user.ID, n, channelID, page)
+func (clientVideo ClientVideo) SortVideo(user models.User, n int, channelID string, page int) (subVideos []models.Subvideo, err error) {
+	subVideos, err = models.SelectVideo(int(user.Id), n, channelID, page)
 	if err != nil {
-		log.Fatal(err)
 		return subVideos, err
 	}
 
 	return subVideos, nil
 }
 
-func (clientVideo ClientVideo) TWGetVideo(user User) (err error) {
+func (clientVideo ClientVideo) TWGetVideo(user models.User) (err error) {
 	videos := clientVideo.twClient.GetVideos(user.TWOAuth)
 	for _, video := range videos {
-		err = clientVideo.dataBase.InsertVideo(
-			user.ID,
-			video.TypeSub,
-			video.Title,
-			video.Channel,
-			video.ChannelID,
-			video.Game,
-			video.Description,
-			video.URL,
-			video.ThumbURL,
-			video.Length,
-			video.Date.UTC(),
-		)
-		if err != nil {
-			return err
-		}
+		video.UserID = user.Id
+		video.Insert()
 	}
 
 	return nil
 }
 
-func (clientVideo ClientVideo) YTGetVideo(user User) (err error) {
+func (clientVideo ClientVideo) YTGetVideo(user models.User) (err error) {
 	if user.YTChannelID == "" {
 		return nil
 	}
@@ -131,19 +103,20 @@ func (clientVideo ClientVideo) YTGetVideo(user User) (err error) {
 				return err
 			}
 
-			err = clientVideo.dataBase.InsertVideo(
-				user.ID,
-				"youtube",
-				video.Snippet.Title,
-				video.Snippet.ChannelTitle,
-				video.Snippet.ChannelId,
-				"",
-				video.Snippet.Description,
-				"https://www.youtube.com/watch?v="+video.Id,
-				video.Snippet.Thumbnails.High.Url,
-				int(durationVideo.Seconds()),
-				ytTime.UTC(),
-			)
+			subvideo := models.Subvideo{
+				UserID:      user.Id,
+				TypeSub:     "youtube",
+				Title:       video.Snippet.Title,
+				Channel:     video.Snippet.ChannelTitle,
+				ChannelID:   video.Snippet.ChannelId,
+				Description: video.Snippet.Description,
+				URL:         "https://www.youtube.com/watch?v=" + video.Id,
+				ThumbURL:    video.Snippet.Thumbnails.High.Url,
+				Length:      int(durationVideo.Seconds()),
+				Date:        ytTime.UTC(),
+			}
+			subvideo.Insert()
+
 			if err != nil {
 				return err
 			}

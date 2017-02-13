@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/DeKoniX/subvideo/models"
+
 	"github.com/go-macaron/binding"
 	"github.com/go-macaron/gzip"
 
@@ -37,6 +39,7 @@ type configYML struct {
 }
 
 var config configYML
+
 var clientVideo ClientVideo
 
 func main() {
@@ -51,15 +54,9 @@ func main() {
 		config.YouTube.DeveloperKey,
 	)
 
-	clientVideo.dataBase, err = DBInit(
-		config.DataBase.Host,
-		config.DataBase.Port,
-		config.DataBase.UserName,
-		config.DataBase.Password,
-		config.DataBase.DBname,
-	)
+	err = models.Init(config.DataBase.Host, config.DataBase.Port, config.DataBase.UserName, config.DataBase.Password, config.DataBase.DBname)
 	if err != nil {
-		log.Fatal("DB ERR: ", err)
+		log.Panic(err)
 	}
 	go runTime()
 
@@ -87,7 +84,7 @@ func main() {
 	log.Println(http.ListenAndServe(":8181", m))
 }
 
-func runUser(user User) {
+func runUser(user models.User) {
 	log.Println("RUN User: ", user.UserName)
 	err := clientVideo.YTGetVideo(user)
 	if err != nil {
@@ -103,7 +100,7 @@ func runTime() {
 	var err error
 	run := true
 
-	users, err := clientVideo.dataBase.SelectUsers()
+	users, err := models.SelectUsers()
 	if err != nil {
 		log.Println("ERR Users get: ", err)
 	}
@@ -125,7 +122,7 @@ func runTime() {
 		if time.Now().Minute()%30 == 0 && run {
 			log.Println("RUN groutine")
 			run = false
-			users, err = clientVideo.dataBase.SelectUsers()
+			users, err = models.SelectUsers()
 			if err != nil {
 				log.Println("ERR Users get: ", err)
 			}
@@ -140,11 +137,11 @@ func runTime() {
 				}
 			}
 			if time.Now().Minute() == 0 {
-				err = clientVideo.dataBase.DeleteVideoWhereInterval(config.DeleteVideoInterval)
+				err = models.DeleteVideoWhereInterval(config.DeleteVideoInterval)
 				if err != nil {
 					log.Println("ERR Clear Video: ", err)
 				}
-				err = clientVideo.dataBase.DeleteUserWhereInterval(config.DeleteUserInterval)
+				err = models.DeleteUserWhereInterval(config.DeleteUserInterval)
 				if err != nil {
 					log.Println("ERR Clear Users: ", err)
 				}
