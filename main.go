@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"html/template"
 	"io/ioutil"
 	"log"
@@ -43,7 +44,10 @@ var config configYML
 var clientVideo ClientVideo
 
 func main() {
-	err := getConfig()
+	var configPath = flag.String("config", "subvideo.yml", "Путь до конфигурационного файла")
+	flag.Parse()
+
+	err := getConfig(*configPath)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -154,8 +158,8 @@ func runTime() {
 	}
 }
 
-func getConfig() (err error) {
-	dat, err := ioutil.ReadFile("subvideo.yml")
+func getConfig(configPath string) (err error) {
+	dat, err := ioutil.ReadFile(configPath)
 	if err != nil {
 		return err
 	}
