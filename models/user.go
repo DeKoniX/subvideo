@@ -6,16 +6,19 @@ import (
 )
 
 type User struct {
-	Id          int64
-	YTChannelID string    `xorm:"'yt_channel_id'"`
-	TWChannelID string    `xorm:"'tw_channel_id'"`
-	TWOAuth     string    `xorm:"'tw_oauth'"`
-	UserName    string    `xorm:"notnull index 'username'"`
-	AvatarURL   string    `xorm:"'avatar_url'"`
-	Crypt       string    `xorm:"'crypt'"`
-	TimeZone    string    `xorm:"'timezone'"`
-	CreatedAt   time.Time `xorm:"created"`
-	UpdatedAt   time.Time `xorm:"'updated_at'"`
+	Id             int64
+	YTChannelID    string    `xorm:"'yt_channel_id'"`
+	TWChannelID    string    `xorm:"'tw_channel_id'"`
+	TWOAuth        string    `xorm:"'tw_oauth'"`
+	YTOAuth        string    `xorm:"'yt_oauth'"`
+	YTRefreshToken string    `xorm:"'yt_refresh_token'"`
+	YTExpiry       time.Time `xorm:"'yt_expiry'"`
+	UserName       string    `xorm:"notnull index 'username'"`
+	AvatarURL      string    `xorm:"'avatar_url'"`
+	Crypt          string    `xorm:"'crypt'"`
+	TimeZone       string    `xorm:"'timezone'"`
+	CreatedAt      time.Time `xorm:"created"`
+	UpdatedAt      time.Time `xorm:"'updated_at'"`
 }
 
 func (user User) Insert() error {

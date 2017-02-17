@@ -13,12 +13,16 @@ import (
 	"github.com/go-macaron/binding"
 	"github.com/go-macaron/gzip"
 
+	"github.com/DeKoniX/subvideo/video"
 	macaron "gopkg.in/macaron.v1"
 	yaml "gopkg.in/yaml.v2"
 )
 
 type configYML struct {
 	YouTube struct {
+		ClientID     string `yaml:"clientid"`
+		ClientSecret string `yaml:"clientsecret"`
+		RedirectURI  string `yaml:"redirecturi"`
 		DeveloperKey string `yaml:"developerkey"`
 	}
 	Twitch struct {
@@ -41,7 +45,7 @@ type configYML struct {
 
 var config configYML
 
-var clientVideo ClientVideo
+var clientVideo *video.ClientVideo
 
 func main() {
 	var configPath = flag.String("config", "subvideo.yml", "Путь до конфигурационного файла")
@@ -52,10 +56,13 @@ func main() {
 		log.Panic(err)
 	}
 
-	clientVideo = InitClientVideo(
+	clientVideo = video.Init(
 		config.Twitch.ClientID,
 		config.Twitch.ClientSecret,
-		config.YouTube.DeveloperKey,
+		config.Twitch.RedirectURI,
+		config.YouTube.ClientID,
+		config.YouTube.ClientSecret,
+		config.YouTube.RedirectURI,
 	)
 
 	err = models.Init(config.DataBase.Host, config.DataBase.Port, config.DataBase.UserName, config.DataBase.Password, config.DataBase.DBname)
@@ -78,6 +85,7 @@ func main() {
 	m.Get("/", indexHandler)
 	m.Get("/last", lastHandler)
 	m.Get("/oauth/twitch", twOAuthHandler)
+	m.Get("/oauth/youtube", ytOAuthHandler)
 	m.Get("/login", loginHandler)
 	m.Get("/logout", logoutHandler)
 	m.Combo("/user").

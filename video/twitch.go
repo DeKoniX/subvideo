@@ -1,4 +1,4 @@
-package main
+package video
 
 import (
 	"encoding/json"
@@ -15,18 +15,20 @@ import (
 type TW struct {
 	ClientID     string
 	ClientSecret string
+	RedirectURI  string
 	HTTPClient   *http.Client
 }
 
-func TWInit(httpClient *http.Client, clientID, clientSecret string) (tw TW) {
-	tw.ClientID = clientID
-	tw.HTTPClient = httpClient
-	tw.ClientSecret = clientSecret
-
-	return tw
+func TWInit(clientID, clientSecret, redirectURI string) *TW {
+	return &TW{
+		ClientID:     clientID,
+		ClientSecret: clientSecret,
+		HTTPClient:   &http.Client{},
+		RedirectURI:  redirectURI,
+	}
 }
 
-func (tw TW) connect(url, oauth string) (body []byte) {
+func (tw *TW) connect(url, oauth string) (body []byte) {
 	req, _ := http.NewRequest("GET", "https://api.twitch.tv/kraken/"+url, nil)
 	req.Header.Add("Accept", "application/vnd.twitchtv.v3+json")
 	req.Header.Add("Client-ID", tw.ClientID)
@@ -39,8 +41,8 @@ func (tw TW) connect(url, oauth string) (body []byte) {
 	return body
 }
 
-func (tw TW) OAuthTest(oauth string) (user models.User, err error) {
-	body := tw.connect("user", oauth)
+func (tw *TW) OAuthTest(accessToken string) (twChannelID, userName, avatarURL string, err error) {
+	body := tw.connect("user", accessToken)
 
 	type twJSON struct {
 		DisplayName string `json:"display_name"`
@@ -55,23 +57,22 @@ func (tw TW) OAuthTest(oauth string) (user models.User, err error) {
 	json.Unmarshal(body, &twjson)
 
 	if twjson.Error != "" {
-		return user, fmt.Errorf("ERR Twitch API: %s, %s", twjson.Error, twjson.Message)
+		return twChannelID, userName, avatarURL, fmt.Errorf("ERR Twitch API: %s, %s", twjson.Error, twjson.Message)
 	}
 
-	curUser, _ := models.SelectUserForUserName(twjson.DisplayName)
-	curUser.TWChannelID = twjson.Name
-	curUser.UserName = twjson.DisplayName
-	curUser.AvatarURL = twjson.Logo
-	return curUser, nil
+	twChannelID = twjson.Name
+	userName = twjson.DisplayName
+	avatarURL = twjson.Logo
+	return twChannelID, userName, avatarURL, nil
 }
 
-func (tw TW) Auth(code string) string {
+func (tw *TW) Auth(code string) string {
 	resp, _ := tw.HTTPClient.PostForm("https://api.twitch.tv/kraken/oauth2/token",
 		url.Values{
 			"client_id":     {tw.ClientID},
 			"client_secret": {tw.ClientSecret},
 			"grant_type":    {"authorization_code"},
-			"redirect_uri":  {config.Twitch.RedirectURI},
+			"redirect_uri":  {tw.RedirectURI},
 			"code":          {code},
 		},
 	)
@@ -86,7 +87,7 @@ func (tw TW) Auth(code string) string {
 	return jsontw.AccessToken
 }
 
-func (tw TW) GetOnline(oauth string) (videos []models.Subvideo) {
+func (tw *TW) GetOnline(oauth string) (videos []models.Subvideo) {
 	body := tw.connect("streams/followed?limit=50&stream_type=live", oauth)
 
 	type jsonTW struct {
@@ -127,7 +128,7 @@ func (tw TW) GetOnline(oauth string) (videos []models.Subvideo) {
 	return videos
 }
 
-func (tw TW) GetVideos(oauth string) (videos []models.Subvideo) {
+func (tw *TW) GetVideos(oauth string) (videos []models.Subvideo) {
 	body := tw.connect("videos/followed?limit=20&broadcast_type=all", oauth)
 
 	type jsonTW struct {

@@ -13,8 +13,7 @@ import (
 )
 
 type ChangeUserForm struct {
-	YtChannelID string `form:"yt_channel_id" binding:"Required"`
-	TimeZone    string `form:"timezone" binding:"Required"`
+	TimeZone string `form:"timezone" binding:"Required"`
 }
 
 func logoutHandler(ctx *macaron.Context) {
@@ -25,12 +24,23 @@ func logoutHandler(ctx *macaron.Context) {
 
 func twOAuthHandler(ctx *macaron.Context) {
 	code := ctx.Query("code")
-	oauth := clientVideo.twClient.Auth(code)
-	user, err := clientVideo.twClient.OAuthTest(oauth)
+	oauth := clientVideo.TWClient.Auth(code)
+	twChannelID, userName, avatarURL, err := clientVideo.TWClient.OAuthTest(oauth)
 	if err != nil {
 		log.Println("ERR OAUTH Twitch:", err)
 		ctx.Redirect("/login")
 	}
+	user := currentUser(ctx.GetCookie("username"), ctx.GetCookie("crypt"))
+	if user.UserName == "" {
+		user, _ = models.SelectUserForUserName(userName)
+		if user.UserName == "" {
+			user.UserName = userName
+		}
+	}
+
+	user.TWChannelID = twChannelID
+	user.AvatarURL = avatarURL
+
 	timeNow := time.Now().UTC()
 	hash := crypt(user.UserName, timeNow)
 
@@ -40,12 +50,51 @@ func twOAuthHandler(ctx *macaron.Context) {
 
 	err = user.Insert()
 	if err != nil {
-		log.Panic(err)
+		log.Println("ERR USER ADD:", err)
+		ctx.Redirect("/login")
 	}
-	user, err = models.SelectUserForUserName(user.UserName)
+	go runUser(user)
+
+	ctx.SetCookie("username", user.UserName, time.Now().Add(time.Hour*24*30))
+	ctx.SetCookie("crypt", hash, time.Now().Add(time.Hour*24*30))
+	ctx.Redirect("/")
+}
+
+func ytOAuthHandler(ctx *macaron.Context) {
+	code := ctx.Query("code")
+	token := clientVideo.YTClient.Auth(code)
+	ytChannelID, userName, avatarURL, err := clientVideo.YTClient.OAuthTest(token)
 	if err != nil {
-		log.Panic(err)
+		log.Println("ERR OAUTH YouTube:", err)
+		ctx.Redirect("/login")
 	}
+	user := currentUser(ctx.GetCookie("username"), ctx.GetCookie("crypt"))
+	if user.UserName == "" {
+		user, _ = models.SelectUserForUserName(userName)
+		if user.UserName == "" {
+			user.UserName = userName
+		}
+	}
+	user.YTChannelID = ytChannelID
+	user.AvatarURL = avatarURL
+
+	timeNow := time.Now().UTC()
+	hash := crypt(user.UserName, timeNow)
+
+	user.YTOAuth = token.AccessToken
+	user.YTRefreshToken = token.RefreshToken
+	user.YTExpiry = token.Expiry
+	user.Crypt = hash
+	user.UpdatedAt = timeNow
+
+	err = user.Insert()
+	if err != nil {
+		log.Println("ERR USER ADD:", err)
+		ctx.Redirect("/login")
+	}
+
+	user, _ = models.SelectUserForUserName(user.UserName)
+
 	go runUser(user)
 
 	ctx.SetCookie("username", user.UserName, time.Now().Add(time.Hour*24*30))
@@ -57,13 +106,14 @@ func loginHandler(ctx *macaron.Context) {
 	u, _ := url.Parse("https://api.twitch.tv/kraken/oauth2/authorize")
 	q := u.Query()
 	q.Set("response_type", "code")
-	q.Set("client_id", clientVideo.twClient.ClientID)
+	q.Set("client_id", clientVideo.TWClient.ClientID)
 	q.Set("scope", "user_read")
 	q.Set("redirect_uri", config.Twitch.RedirectURI)
 	u.RawQuery = q.Encode()
 
 	ctx.Data["HeadURL"] = config.HeadURL
-	ctx.Data["URL"] = u.String()
+	ctx.Data["TwitchURL"] = u.String()
+	ctx.Data["YouTubeURL"] = clientVideo.YTClient.URL
 	ctx.HTML(200, "login")
 }
 
@@ -147,7 +197,7 @@ func indexHandler(ctx *macaron.Context) {
 		if err != nil {
 			log.Panicln(err)
 		}
-		channelOnline := clientVideo.twClient.GetOnline(user.TWOAuth)
+		channelOnline := clientVideo.TWClient.GetOnline(user.TWOAuth)
 		switch len(channelOnline) {
 		case 1:
 			title = fmt.Sprintf("сейчас идет %d стрим", len(channelOnline))
@@ -181,6 +231,17 @@ func userHandler(ctx *macaron.Context) {
 	user := currentUser(ctx.GetCookie("username"), ctx.GetCookie("crypt"))
 
 	if user.UserName != "" {
+		u, _ := url.Parse("https://api.twitch.tv/kraken/oauth2/authorize")
+		q := u.Query()
+		q.Set("response_type", "code")
+		q.Set("client_id", clientVideo.TWClient.ClientID)
+		q.Set("scope", "user_read")
+		q.Set("redirect_uri", config.Twitch.RedirectURI)
+		u.RawQuery = q.Encode()
+
+		ctx.Data["TwitchURL"] = u.String()
+		ctx.Data["YouTubeURL"] = clientVideo.YTClient.URL
+
 		var title string
 
 		title = fmt.Sprintf("Настройки пользователя %s", user.UserName)
@@ -202,10 +263,7 @@ func userChangeHandler(ctx *macaron.Context, changeUserForm ChangeUserForm) {
 	}
 
 	if login {
-		ytChannelID := changeUserForm.YtChannelID
 		timezone := changeUserForm.TimeZone
-
-		user.YTChannelID = ytChannelID
 		user.TimeZone = timezone
 		err := user.Insert()
 		if err != nil {
