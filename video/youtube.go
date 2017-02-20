@@ -6,8 +6,11 @@ import (
 	"strings"
 	"time"
 
+	"errors"
+
 	"github.com/DeKoniX/subvideo/models"
 	"golang.org/x/oauth2"
+	"google.golang.org/api/plus/v1"
 	"google.golang.org/api/youtube/v3"
 )
 
@@ -21,7 +24,7 @@ func YTInit(clientID, clientSecret, redirectURL string) *YT {
 	conf := &oauth2.Config{
 		ClientID:     clientID,
 		ClientSecret: clientSecret,
-		Scopes:       []string{youtube.YoutubeReadonlyScope},
+		Scopes:       []string{youtube.YoutubeReadonlyScope, plus.UserinfoProfileScope},
 		RedirectURL:  redirectURL,
 		Endpoint: oauth2.Endpoint{
 			AuthURL:  "https://accounts.google.com/o/oauth2/auth",
@@ -42,22 +45,31 @@ func (yt *YT) Auth(code string) *oauth2.Token {
 
 func (yt *YT) OAuthTest(token *oauth2.Token) (ytChannelID, userName, avatarURL string, err error) {
 	client := yt.oauthConf.Client(yt.context, token)
-	service, err := youtube.New(client)
+	plusService, err := plus.New(client)
+	youtubeService, err := youtube.New(client)
 	if err != nil {
 		return ytChannelID, userName, avatarURL, err
-	}
-	call := service.Activities.List("snippet").Mine(true)
-	res, err := call.Do()
-	if err != nil {
-		return ytChannelID, userName, avatarURL, err
-	}
-	for _, item := range res.Items {
-		if item.Snippet.Type == "subscription" {
-			return item.Snippet.ChannelId, item.Snippet.ChannelTitle, item.Snippet.Thumbnails.Default.Url, nil
-		}
 	}
 
-	return ytChannelID, userName, avatarURL, err
+	person, err := plusService.People.Get("me").Do()
+	if err != nil {
+		return ytChannelID, userName, avatarURL, err
+	}
+
+	channel, err := youtubeService.Channels.List("id").Mine(true).Do()
+	if err != nil {
+		return ytChannelID, userName, avatarURL, err
+	}
+
+	userName = person.Nickname
+	if userName == "" {
+		userName = person.DisplayName
+	}
+
+	if channel.Items[0].Id == "" || userName == "" {
+		return ytChannelID, userName, avatarURL, errors.New("No username or ytID: UserName: " + userName + " ytID: " + channel.Items[0].Id)
+	}
+	return channel.Items[0].Id, userName, person.Image.Url, nil
 }
 
 func (yt *YT) GetVideos(user models.User) (videos []models.Subvideo, err error) {
