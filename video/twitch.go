@@ -115,7 +115,7 @@ func (tw *TW) GetOnline(oauth string) (videos []models.Subvideo) {
 			twTime = time.Now()
 		}
 		videos = append(videos, models.Subvideo{
-			TypeSub:   "Online",
+			TypeSub:   "stream",
 			Title:     stream.Channel.Status,
 			Channel:   stream.Channel.DisplayName,
 			ChannelID: stream.Channel.Name,
@@ -136,9 +136,10 @@ func (tw *TW) GetVideos(oauth string) (videos []models.Subvideo) {
 			Title       string `json:"title"`
 			Description string `json:"description"`
 			URL         string `json:"url"`
+			ID          string `json:"_id"`
 			RecordedAt  string `json:"recorded_at"`
 			Game        string `json:"game"`
-			Length      int    `json:length`
+			Length      int    `json:"length"`
 			Preview     string `json:"preview"`
 			Channel     struct {
 				Name        string `json:"name"`
@@ -164,6 +165,7 @@ func (tw *TW) GetVideos(oauth string) (videos []models.Subvideo) {
 				Game:        video.Game,
 				Description: video.Description,
 				URL:         video.URL,
+				VideoID:     video.ID,
 				ThumbURL:    video.Preview,
 				Length:      video.Length,
 				Date:        twTime.UTC(),
@@ -172,6 +174,30 @@ func (tw *TW) GetVideos(oauth string) (videos []models.Subvideo) {
 	}
 
 	return videos
+}
+
+func (tw *TW) GetChannel(oauth, channelID string) models.Subvideo {
+	body := tw.connect("channels/"+channelID, oauth)
+
+	type jsonTW struct {
+		Status      string `json:"status"`
+		DisplayName string `json:"display_name"`
+		Game        string `json:"game"`
+		Name        string `json:"name"`
+		URL         string `json:"url"`
+	}
+
+	var jsontw jsonTW
+	json.Unmarshal(body, &jsontw)
+
+	return models.Subvideo{
+		TypeSub:   "stream",
+		Title:     jsontw.Status,
+		Channel:   jsontw.DisplayName,
+		ChannelID: jsontw.Name,
+		Game:      jsontw.Game,
+		URL:       jsontw.URL,
+	}
 }
 
 func getLength(timeStream time.Time) int {

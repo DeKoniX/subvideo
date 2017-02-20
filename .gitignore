@@ -27,6 +27,8 @@ _testmain.go
 
 *.db
 .idea/
+.vscode/
+.sass-cache/
 subvideo.iml
 node_modules/
 tmp/

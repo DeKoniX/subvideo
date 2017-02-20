@@ -227,6 +227,35 @@ func indexHandler(ctx *macaron.Context) {
 	}
 }
 
+func playHandler(ctx *macaron.Context) {
+	typeVideo := ctx.Req.FormValue("type")
+	idVideo := ctx.Req.FormValue("id")
+	user := currentUser(ctx.GetCookie("username"), ctx.GetCookie("crypt"))
+	log.Println(typeVideo, idVideo)
+	if user.UserName != "" {
+		if typeVideo == "stream" {
+			subvideo := clientVideo.TWClient.GetChannel(user.TWOAuth, idVideo)
+			ctx.Data["Title"] = subvideo.Title
+			ctx.Data["SubVideo"] = subvideo
+		} else {
+			subvideo, err := models.SelectVideoForID(idVideo)
+			ctx.Data["Title"] = subvideo.Title
+			ctx.Data["SubVideo"] = subvideo
+			if err != nil {
+				log.Println(err)
+				ctx.Redirect("/")
+			}
+		}
+
+		ctx.Data["User"] = user
+		ctx.Data["TypeVideo"] = typeVideo
+
+		ctx.HTML(200, "play")
+	} else {
+		ctx.Redirect("/login")
+	}
+}
+
 func userHandler(ctx *macaron.Context) {
 	user := currentUser(ctx.GetCookie("username"), ctx.GetCookie("crypt"))
 

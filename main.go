@@ -84,6 +84,7 @@ func main() {
 
 	m.Get("/", indexHandler)
 	m.Get("/last", lastHandler)
+	m.Get("/play", playHandler)
 	m.Get("/oauth/twitch", twOAuthHandler)
 	m.Get("/oauth/youtube", ytOAuthHandler)
 	m.Get("/login", loginHandler)

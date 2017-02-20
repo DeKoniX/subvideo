@@ -1,6 +1,10 @@
 package models
 
-import "time"
+import (
+	"errors"
+	"strconv"
+	"time"
+)
 
 type Subvideo struct {
 	Id          int64
@@ -8,6 +12,7 @@ type Subvideo struct {
 	Title       string    `xorm:"'title'"`
 	Channel     string    `xorm:"'channel'"`
 	ChannelID   string    `xorm:"index 'channel_id'"`
+	VideoID     string    `xorm:"'video_id'"`
 	Game        string    `xorm:"'game'"`
 	Description string    `xorm:"text 'description'"`
 	URL         string    `xorm:"'url'"`
@@ -51,6 +56,24 @@ func SelectVideo(userID, n int, channelID string, page int) (subvideos []Subvide
 			Find(&subvideos)
 	}
 	return subvideos, err
+}
+
+func SelectVideoForID(id string) (subvideo Subvideo, err error) {
+	idInt, err := strconv.Atoi(id)
+	if err != nil {
+		return subvideo, err
+	}
+
+	subvideo.Id = int64(idInt)
+	b, err := x.Get(&subvideo)
+	if err != nil {
+		return subvideo, err
+	}
+	if b == false {
+		return subvideo, errors.New("No video")
+	}
+
+	return subvideo, nil
 }
 
 func DeleteVideoWhereInterval(day int) (err error) {

@@ -129,6 +129,7 @@ func (yt *YT) GetVideos(user models.User) (videos []models.Subvideo, err error) 
 				Channel:     video.Snippet.ChannelTitle,
 				ChannelID:   video.Snippet.ChannelId,
 				Description: video.Snippet.Description,
+				VideoID:     video.Id,
 				URL:         "https://www.youtube.com/watch?v=" + video.Id,
 				ThumbURL:    video.Snippet.Thumbnails.High.Url,
 				Length:      int(durationVideo.Seconds()),

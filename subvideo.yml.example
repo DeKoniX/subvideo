@@ -1,5 +1,7 @@
 youtube:
-  developerkey:
+  clientid:
+  clientsecret:
+  redirecturi: http://localhost:8181/oauth/youtube
 twitch:
   clientid:
   clientsecret:
