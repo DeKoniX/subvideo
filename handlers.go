@@ -239,6 +239,7 @@ func playHandler(ctx *macaron.Context) {
 			ctx.Data["SubVideo"] = subvideo
 		} else {
 			subvideo, err := models.SelectVideoForID(idVideo)
+			ctx.Data["HeadURL"] = config.HeadURL
 			ctx.Data["Title"] = subvideo.Title
 			ctx.Data["SubVideo"] = subvideo
 			if err != nil {

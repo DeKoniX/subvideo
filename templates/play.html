@@ -13,7 +13,7 @@
         </div>
         {{end}} {{if eq .TypeVideo "youtube"}}
         <div class="col-md-12 video">
-        <iframe id="playerVideo" type="text/html" src="http://www.youtube.com/embed/{{ .SubVideo.VideoID }}?autoplay=1" frameborder="0"
+        <iframe id="playerVideo" type="text/html" src="http://www.youtube.com/embed/{{ .SubVideo.VideoID }}?autoplay=1&origin={{ .HeadURL }}" frameborder="0"
         /> 
         </div>
         {{end}} {{if eq .TypeVideo "stream"}}
