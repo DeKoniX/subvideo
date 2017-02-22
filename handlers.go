@@ -114,6 +114,7 @@ func loginHandler(ctx *macaron.Context) {
 	ctx.Data["HeadURL"] = config.HeadURL
 	ctx.Data["TwitchURL"] = u.String()
 	ctx.Data["YouTubeURL"] = clientVideo.YTClient.URL
+
 	ctx.HTML(200, "login")
 }
 
@@ -231,7 +232,6 @@ func playHandler(ctx *macaron.Context) {
 	typeVideo := ctx.Req.FormValue("type")
 	idVideo := ctx.Req.FormValue("id")
 	user := currentUser(ctx.GetCookie("username"), ctx.GetCookie("crypt"))
-	log.Println(typeVideo, idVideo)
 	if user.UserName != "" {
 		if typeVideo == "stream" {
 			subvideo := clientVideo.TWClient.GetChannel(user.TWOAuth, idVideo)
@@ -240,6 +240,7 @@ func playHandler(ctx *macaron.Context) {
 		} else {
 			subvideo, err := models.SelectVideoForID(idVideo)
 			ctx.Data["HeadURL"] = config.HeadURL
+			ctx.Data["URL"] = ctx.Req.URL.String()[1:]
 			ctx.Data["Title"] = subvideo.Title
 			ctx.Data["SubVideo"] = subvideo
 			if err != nil {
