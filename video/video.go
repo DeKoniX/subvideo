@@ -32,23 +32,36 @@ func (client *ClientVideo) SortVideo(user models.User, n int, channelID string, 
 }
 
 func (client *ClientVideo) TWGetVideo(user models.User) (err error) {
-	videos := client.TWClient.GetVideos(user.TWOAuth)
-	for _, video := range videos {
-		video.UserID = user.Id
-		video.Insert()
+	if user.TWOAuth != "" || user.TWChannelID != "" {
+		videos := client.TWClient.GetVideos(user.TWOAuth)
+		for _, video := range videos {
+			video.UserID = user.Id
+			video.Insert()
+		}
+	} else {
+		user.TWChannelID = ""
+		user.TWOAuth = ""
+		user.Insert()
 	}
 	return nil
 }
 
 func (client *ClientVideo) YTGetVideo(user models.User) (err error) {
-	videos, err := client.YTClient.GetVideos(user)
-	if err != nil {
-		return err
-	}
+	if user.YTOAuth != "" || user.YTChannelID != "" {
+		videos, err := client.YTClient.GetVideos(user)
+		if err != nil {
+			return err
+		}
 
-	for _, video := range videos {
-		video.UserID = user.Id
-		video.Insert()
+		for _, video := range videos {
+			video.UserID = user.Id
+			video.Insert()
+		}
+	} else {
+		user.YTChannelID = ""
+		user.YTOAuth = ""
+		user.YTRefreshToken = ""
+		user.Insert()
 	}
 
 	return nil
