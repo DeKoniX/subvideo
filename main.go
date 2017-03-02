@@ -42,7 +42,7 @@ type configYML struct {
 	DeleteVideoInterval int    `yaml:"delete_video_interval"`
 	DeleteUserInterval  int    `yaml:"delete_user_interval"`
 	Metrics             struct {
-		Yandex string `yaml:"yandex"`
+		Yandex int    `yaml:"yandex"`
 		Google string `yaml:"google"`
 	}
 }

@@ -92,7 +92,7 @@ func cryptTest(username, hash string, dateChange time.Time) bool {
 }
 
 type Metrics struct {
-	Yandex string
+	Yandex int
 	Google string
 }
 
