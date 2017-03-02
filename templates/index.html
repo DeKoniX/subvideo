@@ -43,8 +43,7 @@
             </div>
             {{ end }}
         </div>
-        <hr>
-      {{ end }}
+        <hr> {{ end }}
         <h2>Что новенького?</h2>
         <nav aria-label="...">
             <ul class="pager">
@@ -71,6 +70,7 @@
                 <li class="next"><a href="/?page={{ .Page.Next }}"><span aria-hidden="true">&rarr;</span></a></li>
             </ul>
         </nav>
+        {{ template "layouts/footer" }}
     </div>
     <div class="scrollup">
         <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>

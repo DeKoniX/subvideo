@@ -41,6 +41,10 @@ type configYML struct {
 	HeadURL             string `yaml:"headurl"`
 	DeleteVideoInterval int    `yaml:"delete_video_interval"`
 	DeleteUserInterval  int    `yaml:"delete_user_interval"`
+	Metrics             struct {
+		Yandex string `yaml:"yandex"`
+		Google string `yaml:"google"`
+	}
 }
 
 var config configYML
@@ -77,6 +81,7 @@ func main() {
 			"split":    split,
 			"getTime":  getTime,
 			"videoLen": videoLen,
+			"metrics":  metrics,
 		}},
 	}))
 	m.Use(macaron.Static("public"))

@@ -90,3 +90,14 @@ func cryptTest(username, hash string, dateChange time.Time) bool {
 	thisHash := fmt.Sprintf("%x", h.Sum(nil))
 	return thisHash == hash
 }
+
+type Metrics struct {
+	Yandex string
+	Google string
+}
+
+func metrics() (met Metrics) {
+	met.Yandex = config.Metrics.Yandex
+	met.Google = config.Metrics.Google
+	return met
+}
