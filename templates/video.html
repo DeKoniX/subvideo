@@ -1,45 +1,45 @@
 <div class="col-xs-12 col-sm-6 col-md-4">
     <div class="thumbnail">
-        <a href="/play?id={{.Id}}&type={{.TypeSub}}">
-            <img src="{{.ThumbURL}}" alt="{{.Title}}" />
+        <a href="/play?id={{.Subvideo.Id}}&type={{.Subvideo.TypeSub}}">
+            <img src="{{.Subvideo.ThumbURL}}" alt="{{.Subvideo.Title}}" />
         </a>
         <div class="caption">
-            {{if eq .TypeSub "youtube"}}
-            <a href="{{.URL}}" target="_blank">
-                <h4><img src="/ytube.png" alt="YouTube" /> {{.Title}}
+            {{if eq .Subvideo.TypeSub "youtube"}}
+            <a href="{{.Subvideo.URL}}" target="_blank">
+                <h4><img src="/ytube.png" alt="YouTube" /> {{.Subvideo.Title}}
                 </h4>
             </a>
             {{else}}
-            <a href="{{.URL}}" target="_blank">
-                <h4><img src="/twitch.png" alt="Twitch" /> {{.Title}}
+            <a href="{{.Subvideo.URL}}" target="_blank">
+                <h4><img src="/twitch.png" alt="Twitch" /> {{.Subvideo.Title}}
                 </h4>
             </a>
-            <h4>{{.Game}}</h4>
+            <h4>{{.Subvideo.Game}}</h4>
             {{end}}
-            <p>{{videoLen .Length}}</p>
-            <p id="description">{{.Description}}</p>
-            <p>{{getTime .Date}}</p>
+            <p>{{videoLen .Subvideo.Length}}</p>
+            <p id="description">{{.Subvideo.Description}}</p>
+            <p>{{getTime .Subvideo.Date .Tz}}</p>
             <div class="btn-group">
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" area-haspopup="true" area-expanded="false">
-          {{.Channel}} <span class="caret"></span>
+          {{.Subvideo.Channel}} <span class="caret"></span>
         </button>
                 <ul class="dropdown-menu">
-                    <li>{{if eq .TypeSub "youtube"}}
-                        <a href="https://www.youtube.com/channel/{{.ChannelID}}" target="_blank"><img src="/ytube.png" alt="YouTube" id="channelTitle" /> {{.Channel}}
+                    <li>{{if eq .Subvideo.TypeSub "youtube"}}
+                        <a href="https://www.youtube.com/channel/{{.Subvideo.ChannelID}}" target="_blank"><img src="/ytube.png" alt="YouTube" id="channelTitle" /> {{.Subvideo.Channel}}
                         </a>
                         {{else}}
-                        <a href="https://www.twitch.tv/{{.ChannelID}}" target="_blank"><img src="/twitch.png" alt="Twitch" id="channelTitle" /> {{.Channel}}
+                        <a href="https://www.twitch.tv/{{.Subvideo.ChannelID}}" target="_blank"><img src="/twitch.png" alt="Twitch" id="channelTitle" /> {{.Subvideo.Channel}}
                         </a>
                         {{end}}
                     </li>
-                    <li><a href="/last?channelID={{.ChannelID}}">Последние видео</a></li>
+                    <li><a href="/last?channelID={{.Subvideo.ChannelID}}">Последние видео</a></li>
                 </ul>
             </div>
-            {{ if eq .TypeSub "youtube" }}
-            <button class="btn-btn-default jscopy right" id="copy-url" data-clipboard-text="mpv --ytdl-format=136+bestaudio {{.URL}}">
+            {{ if eq .Subvideo.TypeSub "youtube" }}
+            <button class="btn-btn-default jscopy right" id="copy-url" data-clipboard-text="mpv --ytdl-format=136+bestaudio {{.Subvideo.URL}}">
         <span class="glyphicon glyphicon-copy" aria-hidden="true"></span>
       </button> {{else}}
-            <button class="btn-btn-default jscopy right" id="copy-url" data-clipboard-text="mpv --ytdl-format=High {{.URL}}">
+            <button class="btn-btn-default jscopy right" id="copy-url" data-clipboard-text="mpv --ytdl-format=High {{.Subvideo.URL}}">
         <span class="glyphicon glyphicon-copy" aria-hidden="true"></span>
       </button> {{end}}
         </div>
