@@ -3,7 +3,7 @@
 {{ template "layouts/head" .Title }}
 
 <body>
-    {{ $userTimeZone := .User.TimeZone }} {{ template "layouts/navigation" .User}}
+    {{ template "layouts/navigation" .User}}
     <div class="container">
         {{ if ne (len .ChannelOnline) 0 }}
         <h2>Сейчас идут стримы!</h2>
@@ -58,7 +58,7 @@
         <div class="row">
             {{ range $index, $ := .SubVideos }} {{ if split $index 3 }}
             <div class="clearfix hidden-xs"></div>
-            {{ end }} {{ template "video" getVideosAndTime . $userTimeZone }} {{ end }}
+            {{ end }} {{ template "video" . }} {{ end }}
         </div>
         <nav aria-label="...">
             <ul class="pager">

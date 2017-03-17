@@ -1,6 +1,10 @@
 package video
 
-import "github.com/DeKoniX/subvideo/models"
+import (
+	"time"
+
+	"github.com/DeKoniX/subvideo/models"
+)
 
 type ChannelOnline struct {
 	Title     string
@@ -27,6 +31,15 @@ func (client *ClientVideo) SortVideo(user models.User, n int, channelID string, 
 	subVideos, err = models.SelectVideo(int(user.Id), n, channelID, page)
 	if err != nil {
 		return subVideos, err
+	}
+	for _, video := range subVideos {
+		var timezone *time.Location
+		if user.TimeZone == "" {
+			timezone, _ = time.LoadLocation("UTC")
+		} else {
+			timezone, _ = time.LoadLocation(user.TimeZone)
+		}
+		video.Date = video.Date.In(timezone)
 	}
 	return subVideos, nil
 }
