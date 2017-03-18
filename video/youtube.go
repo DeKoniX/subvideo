@@ -108,6 +108,9 @@ func (yt *YT) GetVideos(user models.User) (videos []models.Subvideo, err error) 
 		repeat = false
 		call := service.Subscriptions.List("snippet").Mine(true).MaxResults(50).PageToken(pageToken)
 		response, err := call.Do()
+		if err != nil {
+			return videos, err
+		}
 		if response.NextPageToken != "" {
 			pageToken = response.NextPageToken
 			repeat = true
