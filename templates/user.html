@@ -3,7 +3,7 @@
 {{ template "layouts/head" .Title }}
 
 <body>
-{{ template "layouts/navigation" .User }}
+{{ template "layouts/navigation" navmenu .User .SubVideo}}
 <div class="container">
   <p>
     {{ if eq .User.TWOAuth "" }}

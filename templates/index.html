@@ -3,7 +3,7 @@
 {{ template "layouts/head" .Title }}
 
 <body>
-    {{ template "layouts/navigation" .User}}
+{{ template "layouts/navigation" navmenu .User .SubVideo}}
     <div class="container">
         {{ if ne (len .ChannelOnline) 0 }}
         <h2>Сейчас идут стримы!</h2>

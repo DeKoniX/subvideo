@@ -9,11 +9,9 @@ import (
 	"time"
 
 	"github.com/DeKoniX/subvideo/models"
-
+	"github.com/DeKoniX/subvideo/video"
 	"github.com/go-macaron/binding"
 	"github.com/go-macaron/gzip"
-
-	"github.com/DeKoniX/subvideo/video"
 	macaron "gopkg.in/macaron.v1"
 	yaml "gopkg.in/yaml.v2"
 )
@@ -82,6 +80,7 @@ func main() {
 			"getTime":  getTime,
 			"videoLen": videoLen,
 			"metrics":  metrics,
+			"navmenu":  navmenu,
 		}},
 	}))
 	m.Use(macaron.Static("public"))

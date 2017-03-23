@@ -91,6 +91,15 @@ func cryptTest(username, hash string, dateChange time.Time) bool {
 	return thisHash == hash
 }
 
+type navMenu struct {
+	User     models.User
+	SubVideo models.Subvideo
+}
+
+func navmenu(user models.User, subvideo models.Subvideo) navMenu {
+	return navMenu{User: user, SubVideo: subvideo}
+}
+
 type Metrics struct {
 	Yandex int
 	Google string

@@ -158,6 +158,7 @@ func lastHandler(ctx *macaron.Context) {
 		ctx.Data["Title"] = title
 		ctx.Data["SubVideos"] = subVideos
 		ctx.Data["User"] = user
+		ctx.Data["SubVideo"] = models.Subvideo{}
 		ctx.Data["Page"] = pageStruct{
 			Page: page,
 			Next: pageNext,
@@ -215,6 +216,7 @@ func indexHandler(ctx *macaron.Context) {
 		ctx.Data["SubVideos"] = subVideos
 		ctx.Data["ChannelOnline"] = channelOnline
 		ctx.Data["User"] = user
+		ctx.Data["SubVideo"] = models.Subvideo{}
 		ctx.Data["Page"] = pageStruct{
 			Page: page,
 			Next: pageNext,
@@ -278,6 +280,7 @@ func userHandler(ctx *macaron.Context) {
 		title = fmt.Sprintf("Настройки пользователя %s", user.UserName)
 		ctx.Data["Title"] = title
 		ctx.Data["User"] = user
+		ctx.Data["SubVideo"] = models.Subvideo{}
 		ctx.Data["TimeZones"] = getTimeZones()
 		ctx.HTML(200, "user")
 	} else {
