@@ -29,14 +29,19 @@ module.exports = function (grunt) {
             compile: {
                 files: {
                     'tmp/js/main.js': './assets/javascripts/main.coffee',
+                    'tmp/js/video.js': './assets/javascripts/video.coffee',
                 }
             },
         },
 
         uglify: {
-            build: {
+            main: {
                 src: 'tmp/js/main.js',
                 dest: 'public/assets/js/main.js'
+            },
+            video: {
+                src: 'tmp/js/video.js',
+                dest: 'public/assets/js/video.js'
             }
         },
 
