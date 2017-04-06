@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
-{{ template "layouts/head" .Title }}
+{{ template "layouts/head" .HeadInfo }}
 
 <body>
-{{ template "layouts/navigation" navmenu .User .SubVideo}}
+{{ template "layouts/navigation" navMenu .User .SubVideo}}
 <div class="container">
   <p>
     {{ if eq .User.TWOAuth "" }}

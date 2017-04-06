@@ -80,7 +80,7 @@ func main() {
 			"getTime":  getTime,
 			"videoLen": videoLen,
 			"metrics":  metrics,
-			"navmenu":  navmenu,
+			"navMenu":  navMenu,
 		}},
 	}))
 	m.Use(macaron.Static("public"))

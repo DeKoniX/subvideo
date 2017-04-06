@@ -9,6 +9,8 @@ import (
 	"net/url"
 	"time"
 
+	"errors"
+
 	"github.com/DeKoniX/subvideo/models"
 )
 
@@ -176,7 +178,7 @@ func (tw *TW) GetVideos(oauth string) (videos []models.Subvideo) {
 	return videos
 }
 
-func (tw *TW) GetChannel(oauth, channelID string) models.Subvideo {
+func (tw *TW) GetChannel(oauth, channelID string) (_ models.Subvideo, err error) {
 	body := tw.connect("channels/"+channelID, oauth)
 
 	type jsonTW struct {
@@ -185,10 +187,14 @@ func (tw *TW) GetChannel(oauth, channelID string) models.Subvideo {
 		Game        string `json:"game"`
 		Name        string `json:"name"`
 		URL         string `json:"url"`
+		Error       string `json:"error"`
 	}
 
 	var jsontw jsonTW
 	json.Unmarshal(body, &jsontw)
+	if jsontw.Error != "" {
+		return models.Subvideo{}, errors.New("ERR: " + channelID + ": " + jsontw.Error)
+	}
 
 	return models.Subvideo{
 		TypeSub:   "stream",
@@ -197,7 +203,7 @@ func (tw *TW) GetChannel(oauth, channelID string) models.Subvideo {
 		ChannelID: jsontw.Name,
 		Game:      jsontw.Game,
 		URL:       jsontw.URL,
-	}
+	}, nil
 }
 
 func getLength(timeStream time.Time) int {

@@ -155,7 +155,7 @@ func lastHandler(ctx *macaron.Context) {
 		}
 		title = fmt.Sprintf("%s последние видео", subVideos[0].Channel)
 
-		ctx.Data["Title"] = title
+		ctx.Data["HeadInfo"] = headInfo{Title: title, URL: config.HeadURL + ctx.Req.URL.String()[1:]}
 		ctx.Data["SubVideos"] = subVideos
 		ctx.Data["User"] = user
 		ctx.Data["SubVideo"] = models.Subvideo{}
@@ -202,17 +202,19 @@ func indexHandler(ctx *macaron.Context) {
 		channelOnline := clientVideo.TWClient.GetOnline(user.TWOAuth)
 		switch len(channelOnline) {
 		case 1:
-			title = fmt.Sprintf("сейчас идет %d стрим", len(channelOnline))
+			title = fmt.Sprintf("Сейчас идет %d стрим", len(channelOnline))
 		case 2, 3, 4:
-			title = fmt.Sprintf("сейчас идет %d стрима", len(channelOnline))
+			title = fmt.Sprintf("Сейчас идет %d стрима", len(channelOnline))
+		case 0:
+			title = fmt.Sprint("Стримов сейчас нет")
 		default:
-			title = fmt.Sprintf("сейчас идет %d стримов", len(channelOnline))
+			title = fmt.Sprintf("Сейчас идет %d стримов", len(channelOnline))
 		}
 		if page != 1 {
 			title += fmt.Sprintf(", страница %d", page)
 		}
 
-		ctx.Data["Title"] = title
+		ctx.Data["HeadInfo"] = headInfo{Title: title, URL: config.HeadURL + ctx.Req.URL.String()[1:]}
 		ctx.Data["SubVideos"] = subVideos
 		ctx.Data["ChannelOnline"] = channelOnline
 		ctx.Data["User"] = user
@@ -234,30 +236,31 @@ func playHandler(ctx *macaron.Context) {
 	typeVideo := ctx.Req.FormValue("type")
 	idVideo := ctx.Req.FormValue("id")
 	user := currentUser(ctx.GetCookie("username"), ctx.GetCookie("crypt"))
-	if user.UserName != "" {
-		if typeVideo == "stream" {
-			subvideo := clientVideo.TWClient.GetChannel(user.TWOAuth, idVideo)
-			ctx.Data["Title"] = subvideo.Title
-			ctx.Data["SubVideo"] = subvideo
-		} else {
-			subvideo, err := models.SelectVideoForID(idVideo)
-			ctx.Data["HeadURL"] = config.HeadURL
-			ctx.Data["URL"] = ctx.Req.URL.String()[1:]
-			ctx.Data["Title"] = subvideo.Title
-			ctx.Data["SubVideo"] = subvideo
-			if err != nil {
-				log.Println(err)
-				ctx.Redirect("/")
-			}
+	if typeVideo == "stream" {
+		subvideo, err := clientVideo.TWClient.GetChannel(user.TWOAuth, idVideo)
+		if err != nil {
+			log.Println(err)
+			ctx.Redirect("/")
 		}
-
-		ctx.Data["User"] = user
-		ctx.Data["TypeVideo"] = typeVideo
-
-		ctx.HTML(200, "play")
+		ctx.Data["SubVideo"] = subvideo
+		ctx.Data["HeadInfo"] = headInfo{Title: subvideo.Title, URL: subvideo.URL, ImageURL: subvideo.ThumbURL, Description: subvideo.Description}
 	} else {
-		ctx.Redirect("/login")
+		subvideo, err := models.SelectVideoForID(idVideo)
+		if err != nil {
+			log.Println(err)
+			ctx.Redirect("/")
+		}
+		ctx.Data["SubVideo"] = subvideo
+		ctx.Data["HeadInfo"] = headInfo{Title: subvideo.Title, URL: subvideo.URL, ImageURL: subvideo.ThumbURL, Description: subvideo.Description}
 	}
+	ctx.Data["TypeVideo"] = typeVideo
+
+	if user.UserName != "" {
+		ctx.Data["User"] = user
+	} else {
+		ctx.Data["User"] = models.User{}
+	}
+	ctx.HTML(200, "play")
 }
 
 func userHandler(ctx *macaron.Context) {
@@ -278,7 +281,7 @@ func userHandler(ctx *macaron.Context) {
 		var title string
 
 		title = fmt.Sprintf("Настройки пользователя %s", user.UserName)
-		ctx.Data["Title"] = title
+		ctx.Data["HeadInfo"] = headInfo{Title: title, URL: config.HeadURL + ctx.Req.URL.String()[1:]}
 		ctx.Data["User"] = user
 		ctx.Data["SubVideo"] = models.Subvideo{}
 		ctx.Data["TimeZones"] = getTimeZones()

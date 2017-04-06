@@ -37,12 +37,15 @@
               </a>
               {{end}}
             </li>
+            {{ if ne .User.UserName "" }}
             <li><a href="/last?channelID={{.SubVideo.ChannelID}}">Последние видео</a></li>
+            {{ end }}
           </ul>
         </li>
         {{ end }}
       </ul>
       <ul class="nav navbar-nav navbar-right">
+        {{ if ne .User.UserName "" }}
         {{ if ne .User.AvatarURL "" }}
         <li class="hidden-xs">
           <img src="{{.User.AvatarURL}}" alt="{{.User.UserName}}" width="45px" height="45px">
@@ -50,6 +53,9 @@
         {{ end }}
         <li><a href="/user">Настройки</a></li>
         <li><a href="/logout">Выход</a></li>
+        {{ else }}
+        <li><a href="/login">Войти</a></li>
+        {{ end }}
       </ul>
     </div>
 
