@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <title>SubVideo</title>
     <meta name="description" content="Привет, я могу проверить что же появилось нового на Twitch и YouTube" />
-    <meta property="og:url" content="{{ .HeadURL }}"/>
+    <meta property="og:url" content="{{ .HeadURL }}" />
     <meta property="og:title" content="SubVideo" />
     <meta property="og:image" content="{{ .HeadURL }}tea.png" />
     <link rel="image_src" href="{{ .HeadURL }}tea.png" />
@@ -16,7 +16,14 @@
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.13/clipboard.min.js"></script>
-    <link rel="icon" type="image/png" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+    <meta content="SubVideo" name="apple-mobile-web-app-title">
+    <meta content="SubVideo" name="application-name">
+    <meta name="theme-color" content="#ffffff">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 </head>
 
@@ -26,7 +33,7 @@
             <h1>Приветствую вас на SubVideo!</h1>
             <p>Привет, я могу проверить что же появилось нового на Twitch и YouTube</p>
             <p><a class="btn btn-primary btn-lg" href="{{.TwitchURL}}" role="button">Войти через Twitch</a>
-            <a class="btn btn-primary btn-lg" href="{{.YouTubeURL}}" role="button">Войти через YouTube</a></p>
+                <a class="btn btn-primary btn-lg" href="{{.YouTubeURL}}" role="button">Войти через YouTube</a></p>
         </div>
     </div>
     <div class="scrollup">
@@ -34,7 +41,6 @@
     </div>
 </body>
 <script src="/assets/js/main.js"></script>
-{{ template "metrics/yandex" metrics }}
-{{ template "metrics/google" metrics }}
+{{ template "metrics/yandex" metrics }} {{ template "metrics/google" metrics }}
 
 </html>
