@@ -9,4 +9,8 @@ $('.scrollup').click(->
   window.scroll(0, 0);
 )
 
+$('.refresh').click(->
+  location.reload();
+)
+
 new Clipboard('.jscopy')

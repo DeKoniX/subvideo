@@ -3,7 +3,7 @@
 {{ template "layouts/head" .HeadInfo }}
 
 <body>
-{{ template "layouts/navigation" navMenu .User .SubVideo}}
+    {{ template "layouts/navigation" navMenu .User .SubVideo}}
     <div class="container">
         {{ if ne (len .ChannelOnline) 0 }}
         <h2>Сейчас идут стримы!</h2>
@@ -71,6 +71,9 @@
             </ul>
         </nav>
         {{ template "layouts/footer" }}
+    </div>
+    <div class="refresh">
+        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
     </div>
     <div class="scrollup">
         <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
