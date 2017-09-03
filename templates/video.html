@@ -1,47 +1,39 @@
-<div class="col-xs-12 col-sm-6 col-md-4">
-    <div class="thumbnail">
+<div class="col-sm-12 col-md-6 col-lg-4">
+    <div class="card">
         <a href="/play?id={{.Id}}&type={{.TypeSub}}">
-            <img src="{{.ThumbURL}}" alt="{{.Title}}" />
+            <img class="card-img-top" src="{{.ThumbURL}}" alt="{{.Title}}" />
         </a>
-        <div class="caption">
+        <div class="card-body">
             {{if eq .TypeSub "youtube"}}
             <a href="{{.URL}}" target="_blank">
-                <h4><img src="/ytube.png" alt="YouTube" /> {{.Title}}
-                </h4>
+                <h5><img src="/ytube.png" alt="YouTube" /> {{.Title}}
+                </h5>
             </a>
             {{else}}
             <a href="{{.URL}}" target="_blank">
-                <h4><img src="/twitch.png" alt="Twitch" /> {{.Title}}
-                </h4>
+                <h5><img src="/twitch.png" alt="Twitch" /> {{.Title}}
+                </h5>
             </a>
-            <h4>{{.Game}}</h4>
+            <h6>{{.Game}}</h6>
             {{end}}
-            <p>{{videoLen .Length}}</p>
-            <p id="description">{{.Description}}</p>
-            <p>{{getTime .Date }}</p>
-            <div class="btn-group">
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" area-haspopup="true" area-expanded="false">
-          {{.Channel}} <span class="caret"></span>
+            <p class="card-text">{{videoLen .Length}}</p>
+            <p class="card-text" id="description">{{.Description}}</p>
+            <p class="card-text">{{getTime .Date }}</p>
+            <div class="dropdown float-right">
+              <button type="button" class="btn btn-light btn-sm border border-secondary dropdown-toggle" id="dropdownMenu" data-toggle="dropdown" area-haspopup="true" area-expanded="false">
+          {{.Channel}}
         </button>
-                <ul class="dropdown-menu">
-                    <li>{{if eq .TypeSub "youtube"}}
-                        <a href="https://www.youtube.com/channel/{{.ChannelID}}" target="_blank"><img src="/ytube.png" alt="YouTube" id="channelTitle" /> {{.Channel}}
-                        </a>
-                        {{else}}
-                        <a href="https://www.twitch.tv/{{.ChannelID}}" target="_blank"><img src="/twitch.png" alt="Twitch" id="channelTitle" /> {{.Channel}}
-                        </a>
-                        {{end}}
-                    </li>
-                    <li><a href="/last?channelID={{.ChannelID}}">Последние видео</a></li>
-                </ul>
+        <div class="dropdown-menu">
+                    {{if eq .TypeSub "youtube"}}
+                    <a class="dropdown-item" href="https://www.youtube.com/channel/{{.ChannelID}}" target="_blank"><img src="/ytube.png" alt="YouTube" /> {{.Channel}}
+                    </a>
+                    {{else}}
+                    <a class="dropdown-item" href="https://www.twitch.tv/{{.ChannelID}}" target="_blank"><img src="/twitch.png" alt="Twitch" /> {{.Channel}}
+                    </a>
+                    {{end}}
+                    <a class="dropdown-item" href="/last?channelID={{.ChannelID}}">Последние видео</a>
+                </div>
             </div>
-            {{ if eq .TypeSub "youtube" }}
-            <button class="btn-btn-default jscopy right" id="copy-url" data-clipboard-text="mpv --ytdl-format=136+bestaudio {{.URL}}">
-        <span class="glyphicon glyphicon-copy" aria-hidden="true"></span>
-      </button> {{else}}
-            <button class="btn-btn-default jscopy right" id="copy-url" data-clipboard-text="mpv --ytdl-format=High {{.URL}}">
-        <span class="glyphicon glyphicon-copy" aria-hidden="true"></span>
-      </button> {{end}}
         </div>
     </div>
 </div>

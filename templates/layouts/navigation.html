@@ -1,63 +1,41 @@
-<nav class="navbar navbar-default">
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse"
-              aria-expanded="false">
-        <span class="sr-only">Свернуть</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <a class="navbar-brand" href="/">SUBVideo</a>
-    </div>
-    <!--<form class="navbar-form navbar-left">-->
-    <!--<div class="form-group">-->
-    <!--<input type="text" class="form-control" placeholder="Поиск">-->
-    <!--</div>-->
-    <!--<button type="submit" class="btn btn-default">Искать</button>-->
-    <!--</form>-->
-    <div class="collapse navbar-collapse" id="navbar-collapse">
-      <ul class="nav navbar-nav">
-        {{ if ne .SubVideo.Title "" }}
-        <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
-                                aria-haspopup="true"
-                                aria-expanded="false">{{ .SubVideo.Title }} <span class="caret"></span></a>
-          <ul class="dropdown-menu">
-            <li>{{if eq .SubVideo.TypeSub "youtube"}}
-              <a href="https://www.youtube.com/channel/{{.SubVideo.ChannelID}}" target="_blank"><img src="/ytube.png"
-                                                                                                     alt="YouTube"
-                                                                                                     id="channelTitle"/>
-                {{.SubVideo.Channel}}
-              </a>
-              {{else}}
-              <a href="https://www.twitch.tv/{{.SubVideo.ChannelID}}" target="_blank"><img src="/twitch.png"
-                                                                                           alt="Twitch"
-                                                                                           id="channelTitle"/>
-                {{.SubVideo.Channel}}
-              </a>
-              {{end}}
-            </li>
-            {{ if ne .User.UserName "" }}
-            <li><a href="/last?channelID={{.SubVideo.ChannelID}}">Последние видео</a></li>
-            {{ end }}
-          </ul>
-        </li>
-        {{ end }}
-      </ul>
-      <ul class="nav navbar-nav navbar-right">
-        {{ if ne .User.UserName "" }}
-        {{ if ne .User.AvatarURL "" }}
-        <li class="hidden-xs">
-          <img src="{{.User.AvatarURL}}" alt="{{.User.UserName}}" width="45px" height="45px">
-        </li>
-        {{ end }}
-        <li><a href="/user">Настройки</a></li>
-        <li><a href="/logout">Выход</a></li>
-        {{ else }}
-        <li><a href="/login">Войти</a></li>
-        {{ end }}
-      </ul>
-    </div>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="/">
+        <img class="mb-2" src="/tea.png" width="25" height="25" alt="" /> SUBVideo
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
 
-  </div>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            {{ if ne .SubVideo.Title "" }}
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownVideo" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ .SubVideo.Title }}</a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdownVideo">
+                    {{if eq .SubVideo.TypeSub "youtube"}}
+                    <a href="https://www.youtube.com/channel/{{.SubVideo.ChannelID}}" class="dropdown-item"><img src="/ytube.png" alt="YouTube" /> {{.SubVideo.Channel}}
+                    </a>
+                    {{else}}
+                    <a href="https://www.twitch.tv/{{.SubVideo.ChannelID}}" class="dropdown-item" target="_blank"><img src="/twitch.png" alt="Twitch" /> {{.SubVideo.Channel}}
+                    </a>
+                    {{end}} {{ if ne .User.UserName "" }}
+                    <a href="/last?channelID={{.SubVideo.ChannelID}}" class="dropdown-item">Последние видео</a> {{ end }}
+                </div>
+            </li>
+            {{ end }} 
+        </ul>
+        <ul class="navbar-nav justify-content-end">
+{{ if ne .User.UserName "" }}
+            {{ if ne .User.AvatarURL "" }}
+            <li class="nav-item d-sm-none d-lg-inline d-xl-inline">
+                <img src="{{.User.AvatarURL}}" alt="{{.User.UserName}}" width="45px" height="45px">
+            </li>
+            {{ end }}
+            <li class="nav-item"><a class="nav-link" href="/user">Настройки</a></li>
+            <li class="nav-item"><a class="nav-link" href="/logout">Выход</a></li>
+            {{ else }}
+            <li class="nav-item"><a class="nav-link" href="/login">Войти</a></li>
+            {{ end }}
+        </ul>
+    </div>
 </nav>

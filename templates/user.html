@@ -3,23 +3,20 @@
 {{ template "layouts/head" .HeadInfo }}
 
 <body>
-{{ template "layouts/navigation" navMenu .User .SubVideo}}
-<div class="container">
-  <p>
-    {{ if eq .User.TWOAuth "" }}
-    <a class="btn btn-primary" href="{{.TwitchURL}}" role="button">Войти через Twitch</a>
-    {{ else }}
-    <span class="label label-success">Twitch поключен</span>
-    {{ end }}
-    {{ if eq .User.YTOAuth "" }}
-    <a class="btn btn-primary" href="{{.YouTubeURL}}" role="button">Войти через YouTube</a>
-    {{ else }}
-    <span class="label label-success">YouTube подключен</span>
-    {{ end }}
-  </p>
-  <form action="/user" method="post">
-    <label for="timezone">Выбор часового пояса</label>
-    <select class="form-control" name="timezone">
+    {{ template "layouts/navigation" navMenu .User .SubVideo}}
+  <br/>
+    <div class="container">
+        <p>
+            {{ if eq .User.TWOAuth "" }}
+            <a class="btn btn-primary" href="{{.TwitchURL}}" role="button">Войти через Twitch</a> {{ else }}
+            <span class="badge badge-success">Twitch поключен</span> {{ end }} {{ if eq .User.YTOAuth "" }}
+            <a class="btn btn-primary" href="{{.YouTubeURL}}" role="button">Войти через YouTube</a> {{ else }}
+            <span class="badge badge-success">YouTube подключен</span> {{ end }}
+        </p>
+        <form action="/user" method="post">
+            <div class="form-group">
+                <label for="timezone">Выбор часового пояса:</label>
+                <select class="form-control" name="timezone">
       {{ $userTimeZone := .User.TimeZone }}
       {{ range .TimeZones }}
       {{ if ne .UTC $userTimeZone }}
@@ -29,13 +26,11 @@
       {{ end }}
       {{ end }}
     </select>
-    <button type="submit" class="btn btn-default">Сохранить</button>
-  </form>
-  {{ template "layouts/footer" }}
-</div>
-<div class="scrollup">
-  <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
-</div>
+            </div>
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+        </form>
+        {{ template "layouts/footer" }}
+    </div>
 </body>
 <script type="text/javascript" src="/assets/js/main.js"></script>
 

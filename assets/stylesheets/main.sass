@@ -8,23 +8,26 @@
   cursor: pointer
   display: none
 
-.refresh
-  position: fixed
+.chat-hide
+  position: absolute
   width: 32px
   height: 32px
   font-size: 30px
-  bottom: 20%
-  left: 2%
+  top: 2.5%
+  right: 92%
   cursor: pointer
+  fill: #aaaaaa
 
-#copy-url
-  font-size: 15px
-
-.right
-  float: right
-
-#channelTitle
-  display: inline
+.chat-show
+  position: absolute
+  width: 32px
+  height: 32px
+  font-size: 30px
+  top: 2.5%
+  right: 0%
+  cursor: pointer
+  display: none
+  fill: #aaaaaa
 
 #description
   overflow: hidden
@@ -32,21 +35,18 @@
   word-wrap: break-word
   white-space: pre-line
   height: auto
-  max-height: 100px
+  max-height: 90px
 
-#playerVideo
+.player-embed
   width: 100%
   height: 100vh
 
-#chat_embed
+.chat-embed
   width: 100%
   height: 100vh
 
-.stream
-  padding: 0
+.card-body
+  font-size: smaller
 
-.chat
-  padding: 0
-
-.video
-  padding: 0
+.dropdown-menu
+  font-size: unset

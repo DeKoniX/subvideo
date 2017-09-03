@@ -10,12 +10,17 @@
     <meta property="og:image" content="{{ .HeadURL }}tea.png" />
     <link rel="image_src" href="{{ .HeadURL }}tea.png" />
     <meta property="og:description" content="Привет, я могу проверить что же появилось нового на Twitch и YouTube" />
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+    <link href="/assets/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/assets/css/bootstrap-reboot.min.css" rel="stylesheet" />
+    <link href="/assets/css/bootstrap-grid.min.css" rel="stylesheet" />
+
+    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous"> -->
     <link rel="stylesheet" href="/assets/css/main.css">
-    <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.13/clipboard.min.js"></script>
+    <!-- <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+         <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.5.13/clipboard.min.js"></script> -->
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
     <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
@@ -24,15 +29,16 @@
     <meta content="SubVideo" name="apple-mobile-web-app-title">
     <meta content="SubVideo" name="application-name">
     <meta name="theme-color" content="#ffffff">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 </head>
 
 <body>
     <div class="container">
         <div class="jumbotron">
-            <h1>Приветствую вас на SubVideo!</h1>
-            <p>Привет, я могу проверить что же появилось нового на Twitch и YouTube</p>
-            <p><a class="btn btn-primary btn-lg" href="{{.TwitchURL}}" role="button">Войти через Twitch</a>
+            <h1 class="display-4">Приветствую вас на SubVideo!</h1>
+            <p class="lead">Привет, я могу проверить что же появилось нового на Twitch и YouTube</p>
+            <p class="lead"><a class="btn btn-primary btn-lg" href="{{.TwitchURL}}" role="button">Войти через Twitch</a>
                 <a class="btn btn-primary btn-lg" href="{{.YouTubeURL}}" role="button">Войти через YouTube</a></p>
         </div>
     </div>
@@ -40,6 +46,9 @@
         <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span>
     </div>
 </body>
+<script src="/assets/js/jquery-3.2.1.min.js"></script>
+<script src="/assets/js/popper.min.js"></script>
+<script src="/assets/js/bootstrap.min.js"></script>
 <script src="/assets/js/main.js"></script>
 {{ template "metrics/yandex" metrics }} {{ template "metrics/google" metrics }}
 
