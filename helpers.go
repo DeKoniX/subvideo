@@ -52,6 +52,11 @@ func getTimeZones() (timeZones timeZones) {
 	return timeZones
 }
 
+func dateStreamLen(date time.Time) (strLength string) {
+	duration := time.Until(date)
+	return videoLen(int(duration.Seconds()))
+}
+
 func videoLen(len int) (strLength string) {
 	var hour, min, second int
 	if len > 60 {
@@ -62,13 +67,13 @@ func videoLen(len int) (strLength string) {
 			hour = min / 60
 			min = min % 60
 
-			strLength = fmt.Sprintf("Часов: %d, Минуты: %d, ", hour, min)
+			strLength = fmt.Sprintf("Часов: %d, Минут: %d, ", hour, min)
 		} else {
-			strLength = fmt.Sprintf("Минуты: %d, ", min)
+			strLength = fmt.Sprintf("Минут: %d, ", min)
 		}
-		strLength = strLength + fmt.Sprintf("Секунды: %d", second)
+		strLength = strLength + fmt.Sprintf("Секунд: %d", second)
 	} else {
-		strLength = fmt.Sprintf("Секунды: %d", len)
+		strLength = fmt.Sprintf("Секунд: %d", len)
 	}
 
 	return strLength

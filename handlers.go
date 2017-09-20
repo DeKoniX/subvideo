@@ -199,7 +199,10 @@ func indexHandler(ctx *macaron.Context) {
 		if err != nil {
 			log.Panicln(err)
 		}
-		channelOnline := clientVideo.TWClient.GetOnline(user.TWOAuth)
+		channelOnline, err := clientVideo.GetOnlineStreams(user)
+		if err != nil {
+			log.Panicln(err)
+		}
 		switch len(channelOnline) {
 		case 1:
 			title = fmt.Sprintf("Сейчас идет %d стрим", len(channelOnline))
@@ -236,7 +239,7 @@ func playHandler(ctx *macaron.Context) {
 	typeVideo := ctx.Req.FormValue("type")
 	idVideo := ctx.Req.FormValue("id")
 	user := currentUser(ctx.GetCookie("username"), ctx.GetCookie("crypt"))
-	if typeVideo == "stream" {
+	if typeVideo == "twitch-stream" {
 		subvideo, err := clientVideo.TWClient.GetChannel(user.TWOAuth, idVideo)
 		if err != nil {
 			log.Println(err)

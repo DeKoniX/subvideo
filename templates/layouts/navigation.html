@@ -15,7 +15,16 @@
                     {{if eq .SubVideo.TypeSub "youtube"}}
                     <a href="https://www.youtube.com/channel/{{.SubVideo.ChannelID}}" class="dropdown-item"><img src="/ytube.png" alt="YouTube" /> {{.SubVideo.Channel}}
                     </a>
-                    {{else}}
+                    {{end}} {{if eq .SubVideo.TypeSub "youtube-stream"}}
+                    <a href="https://www.youtube.com/channel/{{.SubVideo.ChannelID}}" class="dropdown-item"><img src="/ytube.png" alt="YouTube" /> {{.SubVideo.Channel}}
+                    </a>
+                    {{end}} {{if eq .SubVideo.TypeSub "youtube-stream-live"}}
+                    <a href="https://www.youtube.com/channel/{{.SubVideo.ChannelID}}" class="dropdown-item"><img src="/ytube.png" alt="YouTube" /> {{.SubVideo.Channel}}
+                    </a>
+                    {{end}} {{if eq .SubVideo.TypeSub "twitch"}}
+                    <a href="https://www.twitch.tv/{{.SubVideo.ChannelID}}" class="dropdown-item" target="_blank"><img src="/twitch.png" alt="Twitch" /> {{.SubVideo.Channel}}
+                    </a>
+                    {{end}} {{if eq .SubVideo.TypeSub "twitch-stream"}}
                     <a href="https://www.twitch.tv/{{.SubVideo.ChannelID}}" class="dropdown-item" target="_blank"><img src="/twitch.png" alt="Twitch" /> {{.SubVideo.Channel}}
                     </a>
                     {{end}} {{ if ne .User.UserName "" }}

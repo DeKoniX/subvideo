@@ -24,11 +24,11 @@
           {{.Channel}}
         </button>
         <div class="dropdown-menu">
-                    {{if eq .TypeSub "youtube"}}
-                    <a class="dropdown-item" href="https://www.youtube.com/channel/{{.ChannelID}}" target="_blank"><img src="/ytube.png" alt="YouTube" /> {{.Channel}}
+                    {{if eq .TypeSub "twitch"}}
+                    <a class="dropdown-item" href="https://www.twitch.tv/{{.ChannelID}}" target="_blank"><img src="/twitch.png" alt="Twitch" /> {{.Channel}}
                     </a>
                     {{else}}
-                    <a class="dropdown-item" href="https://www.twitch.tv/{{.ChannelID}}" target="_blank"><img src="/twitch.png" alt="Twitch" /> {{.Channel}}
+                    <a class="dropdown-item" href="https://www.youtube.com/channel/{{.ChannelID}}" target="_blank"><img src="/ytube.png" alt="YouTube" /> {{.Channel}}
                     </a>
                     {{end}}
                     <a class="dropdown-item" href="/last?channelID={{.ChannelID}}">Последние видео</a>

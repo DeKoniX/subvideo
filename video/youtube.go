@@ -3,6 +3,7 @@ package video
 import (
 	"context"
 	"log"
+	"strconv"
 
 	"strings"
 	"time"
@@ -104,6 +105,8 @@ func (yt *YT) GetVideos(user models.User) (videos []models.Subvideo, err error) 
 	}
 	repeat := true
 	pageToken := ""
+	typeSub := ""
+	var ytTime time.Time
 	for repeat == true {
 		repeat = false
 		call := service.Subscriptions.List("snippet").Mine(true).MaxResults(50).PageToken(pageToken)
@@ -138,24 +141,45 @@ func (yt *YT) GetVideos(user models.User) (videos []models.Subvideo, err error) 
 			for _, videoSearch := range responseSearchVideos.Items {
 				ids += videoSearch.Id.VideoId + ","
 			}
-			callVideos := service.Videos.List("snippet,contentDetails").Id(ids)
+			callVideos := service.Videos.List("snippet,contentDetails,liveStreamingDetails").Id(ids)
 			responseVideos, err := callVideos.Do()
 			if err != nil {
 				return videos, err
 			}
 
 			for _, video := range responseVideos.Items {
-				ytTime, err := time.Parse(time.RFC3339, video.Snippet.PublishedAt)
-				if err != nil {
-					return videos, err
-				}
 				durationVideo, err := time.ParseDuration(strings.ToLower(video.ContentDetails.Duration[2:]))
 				if err != nil {
 					return videos, err
 				}
 
+				switch video.Snippet.LiveBroadcastContent {
+				case "upcoming":
+					ytTime, err = time.Parse(time.RFC3339, video.LiveStreamingDetails.ScheduledStartTime)
+					if err != nil {
+						return videos, err
+					}
+					typeSub = "youtube-stream"
+				case "live":
+					ytTime, err = time.Parse(time.RFC3339, video.LiveStreamingDetails.ActualStartTime)
+					if err != nil {
+						return videos, err
+					}
+					durationVideo, err = time.ParseDuration(strconv.Itoa(getLength(ytTime)) + "s")
+					if err != nil {
+						return videos, err
+					}
+					typeSub = "youtube-stream-live"
+				default:
+					ytTime, err = time.Parse(time.RFC3339, video.Snippet.PublishedAt)
+					if err != nil {
+						return videos, err
+					}
+					typeSub = "youtube"
+				}
+
 				videos = append(videos, models.Subvideo{
-					TypeSub:     "youtube",
+					TypeSub:     typeSub,
 					Title:       video.Snippet.Title,
 					Channel:     video.Snippet.ChannelTitle,
 					ChannelID:   video.Snippet.ChannelId,

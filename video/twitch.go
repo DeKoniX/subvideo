@@ -117,7 +117,7 @@ func (tw *TW) GetOnline(oauth string) (videos []models.Subvideo) {
 			twTime = time.Now()
 		}
 		videos = append(videos, models.Subvideo{
-			TypeSub:   "stream",
+			TypeSub:   "twitch-stream",
 			Title:     stream.Channel.Status,
 			Channel:   stream.Channel.DisplayName,
 			ChannelID: stream.Channel.Name,
@@ -197,15 +197,11 @@ func (tw *TW) GetChannel(oauth, channelID string) (_ models.Subvideo, err error)
 	}
 
 	return models.Subvideo{
-		TypeSub:   "stream",
+		TypeSub:   "twitch-stream",
 		Title:     jsontw.Status,
 		Channel:   jsontw.DisplayName,
 		ChannelID: jsontw.Name,
 		Game:      jsontw.Game,
 		URL:       jsontw.URL,
 	}, nil
-}
-
-func getLength(timeStream time.Time) int {
-	return int(time.Now().Unix() - timeStream.Unix())
 }

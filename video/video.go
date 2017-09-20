@@ -44,6 +44,22 @@ func (client *ClientVideo) SortVideo(user models.User, n int, channelID string, 
 	return subVideos, nil
 }
 
+func (client *ClientVideo) GetOnlineStreams(user models.User) (streamOnline []models.Subvideo, err error) {
+	twitchStream := client.TWClient.GetOnline(user.TWOAuth)
+	youtubeStream, err := models.SelectStreamVideo(int(user.Id))
+	if err != nil {
+		return streamOnline, err
+	}
+	for _, stream := range twitchStream {
+		streamOnline = append(streamOnline, stream)
+	}
+	for _, stream := range youtubeStream {
+		streamOnline = append(streamOnline, stream)
+	}
+
+	return streamOnline, nil
+}
+
 func (client *ClientVideo) TWGetVideo(user models.User) (err error) {
 	if user.TWOAuth != "" || user.TWChannelID != "" {
 		videos := client.TWClient.GetVideos(user.TWOAuth)
@@ -78,4 +94,8 @@ func (client *ClientVideo) YTGetVideo(user models.User) (err error) {
 	}
 
 	return nil
+}
+
+func getLength(timeStream time.Time) int {
+	return int(time.Now().Unix() - timeStream.Unix())
 }

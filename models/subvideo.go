@@ -58,6 +58,17 @@ func SelectVideo(userID, n int, channelID string, page int) (subvideos []Subvide
 	return subvideos, err
 }
 
+func SelectStreamVideo(userID int) (subvideos []Subvideo, err error) {
+	duration := time.Hour * 3
+	dateInterval := time.Now().Add(-duration)
+	dateInterval.Format(time.RFC3339)
+	err = x.Where("type='youtube-stream' AND date>? OR type='youtube-stream-live'", dateInterval).
+		Desc("date").
+		Limit(5).
+		Find(&subvideos)
+	return subvideos, err
+}
+
 func SelectVideoForID(id string) (subvideo Subvideo, err error) {
 	idInt, err := strconv.Atoi(id)
 	if err != nil {
