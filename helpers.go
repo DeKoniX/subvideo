@@ -54,6 +54,9 @@ func getTimeZones() (timeZones timeZones) {
 
 func dateStreamLen(date time.Time) (strLength string) {
 	duration := time.Until(date)
+	if duration.Nanoseconds() <= 0 {
+		return "стрим уже идет"
+	}
 	return videoLen(int(duration.Seconds()))
 }
 

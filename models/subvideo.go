@@ -62,11 +62,14 @@ func SelectStreamVideo(userID int) (subvideos []Subvideo, err error) {
 	duration := time.Hour * 3
 	dateInterval := time.Now().Add(-duration)
 	dateInterval.Format(time.RFC3339)
-	err = x.Where("type='youtube-stream' AND date>? OR type='youtube-stream-live'", dateInterval).
+	err = x.Where("type='youtube-stream' AND date>? AND user_id=? OR type='youtube-stream-live' AND user_id=?", dateInterval, userID, userID).
 		Desc("date").
 		Limit(5).
 		Find(&subvideos)
-	return subvideos, err
+	if err != nil {
+		return subvideos, err
+	}
+	return subvideos, nil
 }
 
 func SelectVideoForID(id string) (subvideo Subvideo, err error) {
@@ -87,10 +90,27 @@ func SelectVideoForID(id string) (subvideo Subvideo, err error) {
 	return subvideo, nil
 }
 
+func SelectStreamOnlineYouTube(userID int) (subvideos []Subvideo, err error) {
+	err = x.Where("user_id=? AND type='youtube-stream-live'", userID).
+		Find(&subvideos)
+	if err != nil {
+		return subvideos, err
+	}
+	return subvideos, nil
+}
+
 func DeleteVideoWhereInterval(day int) (err error) {
 	duration := time.Hour * time.Duration(24*day)
 	dateInterval := time.Now().Add(-duration)
 	dateInterval.Format(time.RFC3339)
 	_, err = x.Where("date<?", dateInterval).Delete(&Subvideo{})
 	return err
+}
+
+func DeleteVideoForVideoID(videoID string) (err error) {
+	_, err = x.Where("video_id = ?", videoID).Delete(&Subvideo{})
+	if err != nil {
+		return err
+	}
+	return nil
 }

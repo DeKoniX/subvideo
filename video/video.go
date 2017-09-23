@@ -86,6 +86,10 @@ func (client *ClientVideo) YTGetVideo(user models.User) (err error) {
 			video.UserID = user.Id
 			video.Insert()
 		}
+		err = client.YTClient.TestStreamYouTube(user)
+		if err != nil {
+			return err
+		}
 	} else {
 		user.YTChannelID = ""
 		user.YTOAuth = ""

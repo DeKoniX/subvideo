@@ -196,3 +196,67 @@ func (yt *YT) GetVideos(user models.User) (videos []models.Subvideo, err error) 
 
 	return videos, nil
 }
+
+func (yt *YT) TestStreamYouTube(user models.User) (err error) {
+	videos, err := models.SelectStreamOnlineYouTube(int(user.Id))
+	if err != nil {
+		return err
+	}
+
+	token := oauth2.Token{AccessToken: user.YTOAuth, RefreshToken: user.YTRefreshToken, Expiry: user.YTExpiry, TokenType: "Bearer"}
+
+	tokenSource := yt.oauthConf.TokenSource(yt.context, &token)
+	updateToken, err := tokenSource.Token()
+	if err != nil {
+		return err
+	}
+
+	if token.AccessToken != updateToken.AccessToken {
+		user.YTOAuth = updateToken.AccessToken
+		user.YTRefreshToken = updateToken.RefreshToken
+		user.YTExpiry = updateToken.Expiry
+		user.Insert()
+	}
+
+	if time.Now().After(user.YTExpiry) {
+		log.Println("Очищаю токен", user.UserName)
+		user.YTOAuth = ""
+		user.YTRefreshToken = ""
+		user.Insert()
+	}
+
+	client := oauth2.NewClient(yt.context, tokenSource)
+
+	service, err := youtube.New(client)
+	if err != nil {
+		return err
+	}
+
+	var ids string
+	for _, video := range videos {
+		ids += video.VideoID
+	}
+
+	callVideos := service.Videos.List("id").Id(ids)
+	responseVideos, err := callVideos.Do()
+	if err != nil {
+		return err
+	}
+
+	for _, video := range videos {
+		deleteVideo := true
+
+		for _, item := range responseVideos.Items {
+			if item.Id == video.VideoID {
+				deleteVideo = false
+			}
+		}
+		if deleteVideo == true {
+			err = models.DeleteVideoForVideoID(video.VideoID)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
