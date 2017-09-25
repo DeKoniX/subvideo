@@ -62,7 +62,7 @@ func SelectStreamVideo(userID int) (subvideos []Subvideo, err error) {
 	duration := time.Hour * 3
 	dateInterval := time.Now().Add(-duration)
 	dateInterval.Format(time.RFC3339)
-	err = x.Where("type='youtube-stream' AND date>? AND user_id=? OR type='youtube-stream-live' AND user_id=?", dateInterval, userID, userID).
+	err = x.Where("(type='youtube-stream' AND date<? AND user_id=?) OR (type='youtube-stream-live' AND user_id=?)", dateInterval, userID, userID).
 		Desc("date").
 		Limit(5).
 		Find(&subvideos)

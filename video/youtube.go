@@ -234,7 +234,7 @@ func (yt *YT) TestStreamYouTube(user models.User) (err error) {
 
 	var ids string
 	for _, video := range videos {
-		ids += video.VideoID
+		ids += video.VideoID + ","
 	}
 
 	callVideos := service.Videos.List("id").Id(ids)
