@@ -91,7 +91,7 @@ func SelectVideoForID(id string) (subvideo Subvideo, err error) {
 }
 
 func SelectStreamOnlineYouTube(userID int) (subvideos []Subvideo, err error) {
-	err = x.Where("user_id=? AND type='youtube-stream-live'", userID).
+	err = x.Where("(type='youtube-stream-live' OR type='youtube-stream') AND user_id=?", userID).
 		Find(&subvideos)
 	if err != nil {
 		return subvideos, err
