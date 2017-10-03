@@ -148,6 +148,7 @@ func (yt *YT) GetVideos(user models.User) (videos []models.Subvideo, err error) 
 			}
 
 			for _, video := range responseVideos.Items {
+
 				durationVideo, err := time.ParseDuration(strings.ToLower(video.ContentDetails.Duration[2:]))
 				if err != nil {
 					return videos, err
@@ -198,6 +199,8 @@ func (yt *YT) GetVideos(user models.User) (videos []models.Subvideo, err error) 
 }
 
 func (yt *YT) TestStreamYouTube(user models.User) (err error) {
+	typeSub := ""
+
 	videos, err := models.SelectStreamOnlineYouTube(int(user.Id))
 	if err != nil {
 		return err
@@ -237,7 +240,7 @@ func (yt *YT) TestStreamYouTube(user models.User) (err error) {
 		ids += video.VideoID + ","
 	}
 
-	callVideos := service.Videos.List("id").Id(ids)
+	callVideos := service.Videos.List("snippet").Id(ids)
 	responseVideos, err := callVideos.Do()
 	if err != nil {
 		return err
@@ -249,6 +252,16 @@ func (yt *YT) TestStreamYouTube(user models.User) (err error) {
 		for _, item := range responseVideos.Items {
 			if item.Id == video.VideoID {
 				deleteVideo = false
+				switch item.Snippet.LiveBroadcastContent {
+				case "upcoming":
+					typeSub = "youtube-stream"
+				case "live":
+					typeSub = "youtube-stream-live"
+				default:
+					typeSub = "youtube"
+				}
+				video.TypeSub = typeSub
+				video.Insert()
 			}
 		}
 		if deleteVideo == true {
