@@ -44,6 +44,23 @@ func (client *ClientVideo) SortVideo(user models.User, n int, channelID string, 
 	return subVideos, nil
 }
 
+func (client *ClientVideo) SearchVideo(user models.User, n, page int, search string) (subVideos []models.Subvideo, err error) {
+	subVideos, err = models.SearchVideo(search, int(user.Id), n, page)
+	if err != nil {
+		return subVideos, err
+	}
+	for _, video := range subVideos {
+		var timezone *time.Location
+		if user.TimeZone == "" {
+			timezone, _ = time.LoadLocation("UTC")
+		} else {
+			timezone, _ = time.LoadLocation(user.TimeZone)
+		}
+		video.Date = video.Date.In(timezone)
+	}
+	return subVideos, nil
+}
+
 func (client *ClientVideo) GetOnlineStreams(user models.User) (streamOnline []models.Subvideo, err error) {
 	twitchStream := client.TWClient.GetOnline(user.TWOAuth)
 	youtubeStream, err := models.SelectStreamVideo(int(user.Id))

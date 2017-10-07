@@ -102,10 +102,11 @@ func cryptTest(username, hash string, dateChange time.Time) bool {
 type navMenuStruct struct {
 	User     models.User
 	SubVideo models.Subvideo
+	Search   string
 }
 
-func navMenu(user models.User, subvideo models.Subvideo) navMenuStruct {
-	return navMenuStruct{User: user, SubVideo: subvideo}
+func navMenu(user models.User, subvideo models.Subvideo, search string) navMenuStruct {
+	return navMenuStruct{User: user, SubVideo: subvideo, Search: search}
 }
 
 type headInfo struct {

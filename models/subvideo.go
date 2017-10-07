@@ -72,6 +72,17 @@ func SelectStreamVideo(userID int) (subvideos []Subvideo, err error) {
 	return subvideos, nil
 }
 
+func SearchVideo(search string, userID, n, page int) (subvideos []Subvideo, err error) {
+	err = x.Where("tsv @@ plainto_tsquery(?) AND user_id = ?", search, userID).
+		Desc("date").
+		Limit(n, page*n-n).
+		Find(&subvideos)
+	if err != nil {
+		return subvideos, err
+	}
+	return subvideos, nil
+}
+
 func SelectVideoForID(id string) (subvideo Subvideo, err error) {
 	idInt, err := strconv.Atoi(id)
 	if err != nil {

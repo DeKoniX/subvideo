@@ -3,7 +3,7 @@
 {{ template "layouts/head" .HeadInfo }}
 
 <body>
-    {{ template "layouts/navigation" navMenu .User .SubVideo}}
+{{ template "layouts/navigation" navMenu .User .SubVideo "Поиск"}}
     <div class="container">
         <h2>Последние видео {{ $channel := index .SubVideos 0}}{{ $channel.Channel }}</h2>
         <div class="row">
@@ -11,6 +11,7 @@
             <div class="clearfix hidden-xs"></div>
             {{ end }} {{ template "video" . }} {{ end }}
         </div>
+      <br>
         <nav aria-label="...">
             <ul class="pagination justify-content-center">
                 {{ if eq .Page.Last 0 }}

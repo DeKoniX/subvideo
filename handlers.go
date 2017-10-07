@@ -118,6 +118,60 @@ func loginHandler(ctx *macaron.Context) {
 	ctx.HTML(200, "login")
 }
 
+func searchHandler(ctx *macaron.Context) {
+	var page, pageNext, pageLast int
+
+	pageS := ctx.Req.FormValue("page")
+	page, err := strconv.Atoi(pageS)
+	if err != nil || page == 0 {
+		page = 1
+	}
+	pageNext = page + 1
+	pageLast = page - 1
+
+	search := ctx.Req.FormValue("search")
+
+	user := currentUser(ctx.GetCookie("username"), ctx.GetCookie("crypt"))
+
+	if user.UserName != "" {
+		var title string
+		type pageStruct struct {
+			Page int
+			Next int
+			Last int
+		}
+
+		subVideos, err := clientVideo.SearchVideo(user, 42, page, search)
+		if err != nil {
+			log.Panicln(err)
+		}
+		if len(subVideos) == 0 {
+			if pageLast == 0 {
+				ctx.Redirect("/")
+				return
+			}
+			ctx.Redirect("/search?search=" + search + "&page=" + strconv.Itoa(pageLast))
+			return
+		}
+		title = fmt.Sprintf("Поиск по строке: %s", search)
+
+		ctx.Data["HeadInfo"] = headInfo{Title: title, URL: config.HeadURL + ctx.Req.URL.String()[1:]}
+		ctx.Data["Search"] = search
+		ctx.Data["SubVideos"] = subVideos
+		ctx.Data["User"] = user
+		ctx.Data["SubVideo"] = models.Subvideo{}
+		ctx.Data["Page"] = pageStruct{
+			Page: page,
+			Next: pageNext,
+			Last: pageLast,
+		}
+		ctx.HTML(200, "search")
+	} else {
+		ctx.Redirect("/login")
+		return
+	}
+}
+
 func lastHandler(ctx *macaron.Context) {
 	var page, pageNext, pageLast int
 
@@ -142,6 +196,9 @@ func lastHandler(ctx *macaron.Context) {
 		}
 
 		subVideos, err := clientVideo.SortVideo(user, 42, channelID, page)
+		if err != nil {
+			log.Panicln(err)
+		}
 		if len(subVideos) == 0 {
 			if pageLast == 0 {
 				ctx.Redirect("/")
@@ -149,9 +206,6 @@ func lastHandler(ctx *macaron.Context) {
 			}
 			ctx.Redirect("/last?channelID=" + channelID + "&page=" + strconv.Itoa(pageLast))
 			return
-		}
-		if err != nil {
-			log.Panicln(err)
 		}
 		title = fmt.Sprintf("%s последние видео", subVideos[0].Channel)
 

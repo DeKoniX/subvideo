@@ -3,7 +3,7 @@
 {{ template "layouts/head" .HeadInfo }}
 
 <body>
-    {{ template "layouts/navigation" navMenu .User .SubVideo}}
+{{ template "layouts/navigation" navMenu .User .SubVideo "Поиск"}}
     <br>
     <div class="container">
         {{ if ne (len .ChannelOnline) 0 }}
@@ -61,6 +61,7 @@
             <div class="clearfix d-none d-sm-block"></div>
             {{ end }} {{ template "video" . }} {{ end }}
         </div>
+      <br>
         <nav aria-label="...">
             <ul class="pagination justify-content-center">
                 {{ if eq .Page.Last 0 }}
