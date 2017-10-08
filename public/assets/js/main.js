@@ -1,1 +1,1 @@
-(function(){$(window).scroll(function(){return $(document).scrollTop()>0?$(".scrollup").fadeIn("fast"):$(".scrollup").fadeOut("fast")}),$(".scrollup").click(function(){return window.scroll(0,0)})}).call(this);
+(function(){var a;$(window).scroll(function(){return $(document).scrollTop()>0?$(".scrollup").fadeIn("fast"):$(".scrollup").fadeOut("fast")}),$(".scrollup").click(function(){return window.scroll(0,0)}),a=new URLSearchParams(window.location.search),null!==a.get("page")&&$("*").is("#video")&&$("html, body").animate({scrollTop:$("#video").offset().top},400)}).call(this);
