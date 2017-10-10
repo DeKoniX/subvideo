@@ -37,7 +37,7 @@ func Init(host, port, username, password, dbname string) (err error) {
 		if err != nil {
 			return err
 		}
-		_, err = x.Exec("UPDATE subvideo SET tsv = setweight(to_tsvector(title), 'A') || setweight(to_tsvector(game), 'B') || setweight(to_tsvector(description), 'C')")
+		_, err = x.Exec("UPDATE subvideo SET tsv = setweight(to_tsvector(title), 'A') || setweight(to_tsvector(channel), 'B') || setweight(to_tsvector(game), 'C') || setweight(to_tsvector(description), 'D')")
 		if err != nil {
 			return err
 		}
