@@ -12,8 +12,8 @@ $('.chat-hide').click(->
 
 $('.chat-show').click(->
   $('#twitch-chat').fadeIn('fast')
-  $('#twitch-stream').css('max-width', '75%')
-  $('#twitch-stream').css('width', '100%')
-  $('#twitch-stream').css('flex-basis', '75%')
+  $('#twitch-stream').css('max-width', '')
+  $('#twitch-stream').css('width', '')
+  $('#twitch-stream').css('flex-basis', '')
   $('.chat-show').fadeOut('fast')
 )
