@@ -37,14 +37,37 @@ func Init(host, port, username, password, dbname string) (err error) {
 		if err != nil {
 			return err
 		}
-		_, err = x.Exec("UPDATE subvideo SET tsv = setweight(to_tsvector(title), 'A') || setweight(to_tsvector(channel), 'B') || setweight(to_tsvector(game), 'C') || setweight(to_tsvector(description), 'D')")
+		_, err = x.Exec("UPDATE subvideo SET tsv = " +
+			"setweight(to_tsvector(coalesce(title, '')), 'A') ||" +
+			"setweight(to_tsvector(coalesce(channel, '')), 'B') ||" +
+			"setweight(to_tsvector(coalesce(game, '')), 'C') ||" +
+			"setweight(to_tsvector(coalesce(description, '')), 'D')")
 		if err != nil {
 			return err
 		}
-		_, err = x.Exec("CREATE INDEX ix_scenes_tsv ON subvideo USING GIN(tsv)")
+		_, err = x.Exec("CREATE INDEX ix_subvideo_tsv ON subvideo USING GIN(tsv)")
 		if err != nil {
 			return err
 		}
+		_, err = x.Exec(
+			`CREATE FUNCTION subvideo_trigger() RETURNS trigger AS $$
+			begin
+				new.tsv :=
+				setweight(to_tsvector(coalesce(new.title, '')),
+					'A') ||
+				setweight(to_tsvector(coalesce(new.channel, '')),
+						'B') ||
+				setweight(to_tsvector(coalesce(new.game, '')),
+						'C') ||
+				setweight(to_tsvector(coalesce(new.description, '')),
+						'D');
+				return new;
+			end
+			$$ LANGUAGE plpgsql;
+
+			CREATE TRIGGER tsvectorupdate BEFORE INSERT OR UPDATE
+			ON subvideo FOR EACH ROW EXECUTE PROCEDURE subvideo_trigger();`,
+		)
 	}
 
 	return nil
