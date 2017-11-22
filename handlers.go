@@ -308,7 +308,8 @@ func playHandler(ctx *macaron.Context) {
 			ctx.Redirect("/")
 		}
 		ctx.Data["SubVideo"] = subvideo
-		ctx.Data["HeadInfo"] = headInfo{Title: subvideo.Title, URL: subvideo.URL, ImageURL: subvideo.ThumbURL, Description: subvideo.Description}
+		embedDomain, _ := url.Parse(config.HeadURL)
+		ctx.Data["HeadInfo"] = headInfo{Title: subvideo.Title, URL: subvideo.URL, ImageURL: subvideo.ThumbURL, Description: subvideo.Description, EmbedDomain: embedDomain.Hostname()}
 	}
 	ctx.Data["TypeVideo"] = typeVideo
 

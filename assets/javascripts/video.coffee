@@ -3,17 +3,17 @@ $(document).ready(->
 )
 
 $('.chat-hide').click(->
-  $('#twitch-chat').fadeOut('fast')
-  $('#twitch-stream').css('max-width', '100%')
-  $('#twitch-stream').css('width', '100%')
-  $('#twitch-stream').css('flex-basis', 'auto')
+  $('#chat').fadeOut('fast')
+  $('#stream').css('max-width', '100%')
+  $('#stream').css('width', '100%')
+  $('#stream').css('flex-basis', 'auto')
   $('.chat-show').fadeIn('fast')
 )
 
 $('.chat-show').click(->
-  $('#twitch-chat').fadeIn('fast')
-  $('#twitch-stream').css('max-width', '')
-  $('#twitch-stream').css('width', '')
-  $('#twitch-stream').css('flex-basis', '')
+  $('#chat').fadeIn('fast')
+  $('#stream').css('max-width', '')
+  $('#stream').css('width', '')
+  $('#stream').css('flex-basis', '')
   $('.chat-show').fadeOut('fast')
 )

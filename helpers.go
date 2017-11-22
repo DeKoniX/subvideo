@@ -114,6 +114,7 @@ type headInfo struct {
 	Description string
 	URL         string
 	ImageURL    string
+	EmbedDomain string
 }
 
 type Metrics struct {
