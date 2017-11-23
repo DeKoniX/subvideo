@@ -103,6 +103,13 @@ func ytOAuthHandler(ctx *macaron.Context) {
 }
 
 func loginHandler(ctx *macaron.Context) {
+	user := currentUser(ctx.GetCookie("username"), ctx.GetCookie("crypt"))
+
+	if user.UserName != "" {
+		ctx.Redirect("/")
+		return
+	}
+
 	u, _ := url.Parse("https://api.twitch.tv/kraken/oauth2/authorize")
 	q := u.Query()
 	q.Set("response_type", "code")
