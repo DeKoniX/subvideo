@@ -23,7 +23,14 @@
                     </a>
                     <div class="card-body">
                         <a href="{{$channel.URL}}" target="_blank">
-                            <h5 class="card-title">{{ .Title }}</h5>
+                            <h5 class="card-title">
+                              {{if eq .TypeSub "twitch-stream"}}
+                              <img src="/twitch.png" alt="YouTube" />
+                              {{else}}
+                              <img src="/ytube.png" alt="Twitch" />
+                              {{end}}
+                              {{ .Title }}
+                            </h5>
                         </a>
                         <h6>{{ $channel.Game }}</h6>
                         {{if eq .TypeSub "youtube-stream"}}
