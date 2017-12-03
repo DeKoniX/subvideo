@@ -71,7 +71,9 @@ func (client *ClientVideo) GetOnlineStreams(user models.User) (streamOnline []mo
 		streamOnline = append(streamOnline, stream)
 	}
 	for _, stream := range youtubeStream {
-		streamOnline = append(streamOnline, stream)
+		if stream.Length != 0 {
+			streamOnline = append(streamOnline, stream)
+		}
 	}
 
 	return streamOnline, nil
