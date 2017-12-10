@@ -254,9 +254,6 @@ func indexHandler(ctx *macaron.Context) {
 		}
 
 		subVideos, err := clientVideo.SortVideo(user, 42, "", page)
-		for _, s := range subVideos {
-			s.Date = timeZone(s.Date, user.TimeZone)
-		}
 		if err != nil {
 			log.Panicln(err)
 		}

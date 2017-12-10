@@ -35,9 +35,20 @@ func timeZone(t time.Time, tz string) (ttz time.Time) {
 	return ttz
 }
 
-func getTime(t time.Time) (timeString string) {
-	timeString = t.Format("02-01-06 ------ 15:04")
+func getTime(t time.Time, tz string) (timeString string) {
+	timezone, _ := time.LoadLocation(tz)
+	ttz := t.In(timezone)
+	timeString = ttz.Format("02-01-06 ------ 15:04")
 	return timeString
+}
+
+type utzavStruct struct {
+	Video models.Subvideo
+	TZ    string
+}
+
+func userTimeZoneAndVideo(video models.Subvideo, tz string) utzavStruct {
+	return utzavStruct{video, tz}
 }
 
 type timeZones []struct {

@@ -64,9 +64,10 @@
         <hr> {{ end }}
       <h2 id="video">Что новенького?</h2>
         <div class="row">
+            {{ $UserTimeZone := .User.TimeZone }}
             {{ range $index, $ := .SubVideos }} {{ if split $index 3 }}
             <div class="clearfix d-none d-sm-block"></div>
-            {{ end }} {{ template "video" . }} {{ end }}
+            {{ end }} {{ template "video" userTimeZoneAndVideo . $UserTimeZone }} {{ end }}
         </div>
       <br>
         <nav aria-label="...">

@@ -76,12 +76,13 @@ func main() {
 	m := macaron.Classic()
 	m.Use(macaron.Renderer(macaron.RenderOptions{
 		Funcs: []template.FuncMap{map[string]interface{}{
-			"split":         split,
-			"getTime":       getTime,
-			"videoLen":      videoLen,
-			"metrics":       metrics,
-			"navMenu":       navMenu,
-			"dateStreamLen": dateStreamLen,
+			"split":                split,
+			"getTime":              getTime,
+			"videoLen":             videoLen,
+			"metrics":              metrics,
+			"navMenu":              navMenu,
+			"dateStreamLen":        dateStreamLen,
+			"userTimeZoneAndVideo": userTimeZoneAndVideo,
 		}},
 	}))
 	m.Use(macaron.Static("public"))

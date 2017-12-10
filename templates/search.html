@@ -6,9 +6,10 @@
 <div class="container">
   <h2>Поиск по: {{ .Search }}</h2>
   <div class="row">
+            {{ $UserTimeZone := .User.TimeZone }}
     {{ range $index, $ := .SubVideos }} {{ if split $index 3 }}
     <div class="clearfix hidden-xs"></div>
-    {{ end }} {{ template "video" . }} {{ end }}
+        {{ end }} {{ template "video" userTimeZoneAndVideo . $UserTimeZone }} {{ end }}
   </div>
   <br>
   <nav aria-label="...">
