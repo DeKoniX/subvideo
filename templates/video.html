@@ -4,17 +4,17 @@
             <img class="card-img-top" src="{{.Video.ThumbURL}}" alt="{{.Video.Title}}" />
         </a>
         <div class="card-body">
-            {{if eq .Video.TypeSub "youtube"}}
+        {{if eq .Video.TypeSub "twitch"}}
             <a href="{{.Video.URL}}" target="_blank">
-                <h5><img src="/ytube.png" alt="YouTube" /> {{.Video.Title}}
-                </h5>
+              <h5><img src="/twitch.png" alt="Twitch"/> {{.Video.Title}}
+              </h5>
             </a>
+          <h6>{{.Video.Game}}</h6>
             {{else}}
             <a href="{{.Video.URL}}" target="_blank">
-                <h5><img src="/twitch.png" alt="Twitch" /> {{.Video.Title}}
-                </h5>
+              <h5><img src="/ytube.png" alt="YouTube"/> {{.Video.Title}}
+              </h5>
             </a>
-            <h6>{{.Video.Game}}</h6>
             {{end}}
             <p class="card-text">{{videoLen .Video.Length}}</p>
             <p class="card-text" id="description">{{.Video.Description}}</p>
