@@ -9,7 +9,7 @@ import (
 
 	"github.com/DeKoniX/subvideo/models"
 
-	macaron "gopkg.in/macaron.v1"
+	"gopkg.in/macaron.v1"
 )
 
 type ChangeUserForm struct {
@@ -24,7 +24,11 @@ func logoutHandler(ctx *macaron.Context) {
 
 func twOAuthHandler(ctx *macaron.Context) {
 	code := ctx.Query("code")
-	oauth := clientVideo.TWClient.Auth(code)
+	oauth, err := clientVideo.TWClient.Auth(code)
+	if err != nil {
+		log.Println("ERR OAUTH Twitch:", err)
+		ctx.Redirect("/login")
+	}
 	twChannelID, userName, avatarURL, err := clientVideo.TWClient.OAuthTest(oauth)
 	if err != nil {
 		log.Println("ERR OAUTH Twitch:", err)

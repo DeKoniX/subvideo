@@ -62,7 +62,10 @@ func (client *ClientVideo) SearchVideo(user models.User, n, page int, search str
 }
 
 func (client *ClientVideo) GetOnlineStreams(user models.User) (streamOnline []models.Subvideo, err error) {
-	twitchStream := client.TWClient.GetOnline(user.TWOAuth)
+	twitchStream, err := client.TWClient.GetOnline(user.TWOAuth)
+	if err != nil {
+		return streamOnline, err
+	}
 	youtubeStream, err := models.SelectStreamVideo(int(user.Id))
 	if err != nil {
 		return streamOnline, err
@@ -81,7 +84,10 @@ func (client *ClientVideo) GetOnlineStreams(user models.User) (streamOnline []mo
 
 func (client *ClientVideo) TWGetVideo(user models.User) (err error) {
 	if user.TWOAuth != "" || user.TWChannelID != "" {
-		videos := client.TWClient.GetVideos(user.TWOAuth)
+		videos, err := client.TWClient.GetVideos(user.TWOAuth)
+		if err != nil {
+			return err
+		}
 		for _, video := range videos {
 			video.UserID = user.Id
 			video.Insert()

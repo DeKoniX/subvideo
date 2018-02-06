@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"time"
@@ -30,21 +29,33 @@ func TWInit(clientID, clientSecret, redirectURI string) *TW {
 	}
 }
 
-func (tw *TW) connect(url, oauth string) (body []byte) {
-	req, _ := http.NewRequest("GET", "https://api.twitch.tv/kraken/"+url, nil)
+func (tw *TW) connect(url, oauth string) (body []byte, err error) {
+	req, err := http.NewRequest("GET", "https://api.twitch.tv/kraken/"+url, nil)
+	if err != nil {
+		return body, err
+	}
 	req.Header.Add("Accept", "application/vnd.twitchtv.v3+json")
 	req.Header.Add("Client-ID", tw.ClientID)
 	if oauth != "" {
 		req.Header.Add("Authorization", "OAuth "+oauth)
 	}
-	resp, _ := tw.HTTPClient.Do(req)
-	body, _ = ioutil.ReadAll(resp.Body)
+	resp, err := tw.HTTPClient.Do(req)
+	if err != nil {
+		return body, err
+	}
+	body, err = ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return body, err
+	}
 
-	return body
+	return body, nil
 }
 
 func (tw *TW) OAuthTest(accessToken string) (twChannelID, userName, avatarURL string, err error) {
-	body := tw.connect("user", accessToken)
+	body, err := tw.connect("user", accessToken)
+	if err != nil {
+		return twChannelID, userName, avatarURL, err
+	}
 
 	type twJSON struct {
 		DisplayName string `json:"display_name"`
@@ -68,8 +79,8 @@ func (tw *TW) OAuthTest(accessToken string) (twChannelID, userName, avatarURL st
 	return twChannelID, userName, avatarURL, nil
 }
 
-func (tw *TW) Auth(code string) string {
-	resp, _ := tw.HTTPClient.PostForm("https://api.twitch.tv/kraken/oauth2/token",
+func (tw *TW) Auth(code string) (accessToken string, err error) {
+	resp, err := tw.HTTPClient.PostForm("https://api.twitch.tv/kraken/oauth2/token",
 		url.Values{
 			"client_id":     {tw.ClientID},
 			"client_secret": {tw.ClientSecret},
@@ -78,19 +89,28 @@ func (tw *TW) Auth(code string) string {
 			"code":          {code},
 		},
 	)
+	if err != nil {
+		return accessToken, err
+	}
 	type jsonTW struct {
 		AccessToken string `json:"access_token"`
 	}
 
 	var jsontw jsonTW
-	body, _ := ioutil.ReadAll(resp.Body)
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return accessToken, err
+	}
 	json.Unmarshal(body, &jsontw)
 
-	return jsontw.AccessToken
+	return jsontw.AccessToken, nil
 }
 
-func (tw *TW) GetOnline(oauth string) (videos []models.Subvideo) {
-	body := tw.connect("streams/followed?limit=50&stream_type=live", oauth)
+func (tw *TW) GetOnline(oauth string) (videos []models.Subvideo, err error) {
+	body, err := tw.connect("streams/followed?limit=50&stream_type=live", oauth)
+	if err != nil {
+		return videos, err
+	}
 
 	type jsonTW struct {
 		Streams []struct {
@@ -127,11 +147,14 @@ func (tw *TW) GetOnline(oauth string) (videos []models.Subvideo) {
 			Length:    getLength(twTime),
 		})
 	}
-	return videos
+	return videos, nil
 }
 
-func (tw *TW) GetVideos(oauth string) (videos []models.Subvideo) {
-	body := tw.connect("videos/followed?limit=20&broadcast_type=all", oauth)
+func (tw *TW) GetVideos(oauth string) (videos []models.Subvideo, err error) {
+	body, err := tw.connect("videos/followed?limit=20&broadcast_type=all", oauth)
+	if err != nil {
+		return videos, err
+	}
 
 	type jsonTW struct {
 		Videos []struct {
@@ -156,7 +179,7 @@ func (tw *TW) GetVideos(oauth string) (videos []models.Subvideo) {
 	for _, video := range jsontw.Videos {
 		twTime, err := time.Parse(time.RFC3339, video.RecordedAt)
 		if err != nil {
-			log.Panicln(err)
+			return videos, err
 		}
 		if video.Length > 300 {
 			videos = append(videos, models.Subvideo{
@@ -175,11 +198,14 @@ func (tw *TW) GetVideos(oauth string) (videos []models.Subvideo) {
 		}
 	}
 
-	return videos
+	return videos, nil
 }
 
-func (tw *TW) GetChannel(oauth, channelID string) (_ models.Subvideo, err error) {
-	body := tw.connect("channels/"+channelID, oauth)
+func (tw *TW) GetChannel(oauth, channelID string) (video models.Subvideo, err error) {
+	body, err := tw.connect("channels/"+channelID, oauth)
+	if err != nil {
+		return video, err
+	}
 
 	type jsonTW struct {
 		Status      string `json:"status"`
@@ -193,7 +219,7 @@ func (tw *TW) GetChannel(oauth, channelID string) (_ models.Subvideo, err error)
 	var jsontw jsonTW
 	json.Unmarshal(body, &jsontw)
 	if jsontw.Error != "" {
-		return models.Subvideo{}, errors.New("ERR: " + channelID + ": " + jsontw.Error)
+		return video, errors.New("ERR: " + channelID + ": " + jsontw.Error)
 	}
 
 	return models.Subvideo{
