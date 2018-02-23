@@ -8,10 +8,10 @@
     <div class="container">
         <p>
             {{ if eq .User.TWOAuth "" }}
-            <a class="btn btn-primary" href="{{.TwitchURL}}" role="button">Войти через Twitch</a> {{ else }}
-            <span class="badge badge-success">Twitch поключен</span> {{ end }} {{ if eq .User.YTOAuth "" }}
-            <a class="btn btn-primary" href="{{.YouTubeURL}}" role="button">Войти через YouTube</a> {{ else }}
-            <span class="badge badge-success">YouTube подключен</span> {{ end }}
+            <a class="btn btn-outline-light" href="{{.TwitchURL}}" role="button">Войти через Twitch</a> {{ else }}
+            <span class="badge badge-secondary">Twitch поключен</span> {{ end }} {{ if eq .User.YTOAuth "" }}
+            <a class="btn btn-outline-light" href="{{.YouTubeURL}}" role="button">Войти через YouTube</a> {{ else }}
+            <span class="badge badge-secondary">YouTube подключен</span> {{ end }}
         </p>
         <form action="/user" method="post">
             <div class="form-group">
@@ -27,7 +27,7 @@
       {{ end }}
     </select>
             </div>
-            <button type="submit" class="btn btn-primary">Сохранить</button>
+            <button type="submit" class="btn btn-outline-light">Сохранить</button>
         </form>
         {{ template "layouts/footer" }}
     </div>
