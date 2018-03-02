@@ -1,39 +1,39 @@
 <div class="col-sm-12 col-md-6 col-lg-4">
-    <div class="card">
-        <a href="/play?id={{.Video.Id}}&type={{.Video.TypeSub}}">
+  <div class="card">
+    <a href="/play?id={{.Video.Id}}&type={{.Video.TypeSub}}">
             <img class="card-img-top" src="{{.Video.ThumbURL}}" alt="{{.Video.Title}}" />
         </a>
-        <div class="card-body">
-        {{if eq .Video.TypeSub "twitch"}}
-            <a href="{{.Video.URL}}" target="_blank">
-              <h5><img src="/twitch.png" alt="Twitch"/> {{.Video.Title}}
-              </h5>
-            </a>
-          <h6>{{.Video.Game}}</h6>
-            {{else}}
-            <a href="{{.Video.URL}}" target="_blank">
-              <h5><img src="/ytube.png" alt="YouTube"/> {{.Video.Title}}
-              </h5>
-            </a>
-            {{end}}
-            <p class="card-text">{{videoLen .Video.Length}}</p>
-            <p class="card-text" id="description">{{.Video.Description}}</p>
-            <p class="card-text">{{getTime .Video.Date .TZ}}</p>
-            <div class="dropdown float-right">
-                <button type="button" class="btn btn-outline-light btn-sm border border-secondary dropdown-toggle" id="dropdownMenu" data-toggle="dropdown" area-haspopup="true" area-expanded="false">
+    <div class="card-body">
+      {{if eq .Video.TypeSub "twitch"}}
+      <a href="{{.Video.URL}}" target="_blank">
+        <h5><img src="/twitch.png" alt="Twitch" /> {{.Video.Title}}
+        </h5>
+      </a>
+      <h6>{{.Video.Game}}</h6>
+      {{else}}
+      <a href="{{.Video.URL}}" target="_blank">
+        <h5><img src="/ytube.png" alt="YouTube" /> {{.Video.Title}}
+        </h5>
+      </a>
+      {{end}}
+      <p class="card-text">{{videoLen .Video.Length}}</p>
+      <p class="card-text" id="description">{{.Video.Description}}</p>
+      <p class="card-text">{{getTime .Video.Date .TZ}}</p>
+      <div class="dropdown float-right">
+        <button type="button" class="btn btn-outline-light btn-sm border border-secondary dropdown-toggle"
+          id="dropdownMenu" data-toggle="dropdown" area-haspopup="true" area-expanded="false">
           {{.Video.Channel}}
         </button>
         <div class="dropdown-menu">
-                    {{if eq .Video.TypeSub "twitch"}}
-                    <a class="dropdown-item" href="https://www.twitch.tv/{{.Video.ChannelID}}" target="_blank"><img src="/twitch.png" alt="Twitch" /> {{.Video.Channel}}
-                    </a>
-                    {{else}}
-                    <a class="dropdown-item" href="https://www.youtube.com/channel/{{.Video.ChannelID}}" target="_blank"><img src="/ytube.png" alt="YouTube" /> {{.Video.Channel}}
-                    </a>
-                    {{end}}
-                    <a class="dropdown-item" href="/last?channelID={{.Video.ChannelID}}">Последние видео</a>
-                </div>
-            </div>
+          {{if eq .Video.TypeSub "twitch"}}
+          <a class="dropdown-item" href="https://www.twitch.tv/{{.Video.ChannelID}}" target="_blank"><img src="/twitch.png" alt="Twitch" /> {{.Video.Channel}}
+                    </a> {{else}}
+          <a class="dropdown-item" href="https://www.youtube.com/channel/{{.Video.ChannelID}}"
+            target="_blank"><img src="/ytube.png" alt="YouTube" /> {{.Video.Channel}}
+                    </a> {{end}}
+          <a class="dropdown-item" href="/last?channelID={{.Video.ChannelID}}">Последние видео</a>
         </div>
+      </div>
     </div>
+  </div>
 </div>

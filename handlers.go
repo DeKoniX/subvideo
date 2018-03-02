@@ -130,38 +130,31 @@ func loginHandler(ctx *macaron.Context) {
 }
 
 func searchHandler(ctx *macaron.Context) {
-	var page, pageNext, pageLast int
+	var page int
 
 	pageS := ctx.Req.FormValue("page")
 	page, err := strconv.Atoi(pageS)
 	if err != nil || page == 0 {
 		page = 1
 	}
-	pageNext = page + 1
-	pageLast = page - 1
-
 	search := ctx.Req.FormValue("search")
 
 	user := currentUser(ctx.GetCookie("username"), ctx.GetCookie("crypt"))
 
 	if user.UserName != "" {
 		var title string
-		type pageStruct struct {
-			Page int
-			Next int
-			Last int
-		}
 
-		subVideos, err := clientVideo.SearchVideo(user, 42, page, search)
+		subVideos, count, err := clientVideo.SearchVideo(user, 42, page, search)
 		if err != nil {
 			log.Panicln(err)
 		}
+		pag := pagination(page, count, 42, "/search?search="+search+"&")
 		if len(subVideos) == 0 {
-			if pageLast == 0 {
+			if pag.Previous == 0 {
 				ctx.Redirect("/")
 				return
 			}
-			ctx.Redirect("/search?search=" + search + "&page=" + strconv.Itoa(pageLast))
+			ctx.Redirect("/search?search=" + search + "&page=" + strconv.Itoa(pag.Previous))
 			return
 		}
 		title = fmt.Sprintf("Поиск по строке: %s", search)
@@ -171,11 +164,7 @@ func searchHandler(ctx *macaron.Context) {
 		ctx.Data["SubVideos"] = subVideos
 		ctx.Data["User"] = user
 		ctx.Data["SubVideo"] = models.Subvideo{}
-		ctx.Data["Page"] = pageStruct{
-			Page: page,
-			Next: pageNext,
-			Last: pageLast,
-		}
+		ctx.Data["Page"] = pag
 		ctx.HTML(200, "search")
 	} else {
 		ctx.Redirect("/login")
@@ -184,38 +173,32 @@ func searchHandler(ctx *macaron.Context) {
 }
 
 func lastHandler(ctx *macaron.Context) {
-	var page, pageNext, pageLast int
+	var page int
 
 	pageS := ctx.Req.FormValue("page")
 	page, err := strconv.Atoi(pageS)
 	if err != nil || page == 0 {
 		page = 1
 	}
-	pageNext = page + 1
-	pageLast = page - 1
-
 	channelID := ctx.Req.FormValue("channelID")
 
 	user := currentUser(ctx.GetCookie("username"), ctx.GetCookie("crypt"))
 
 	if user.UserName != "" {
 		var title string
-		type pageStruct struct {
-			Page int
-			Next int
-			Last int
-		}
 
-		subVideos, err := clientVideo.SortVideo(user, 42, channelID, page)
+		subVideos, count, err := clientVideo.SortVideo(user, 42, channelID, page)
 		if err != nil {
 			log.Panicln(err)
 		}
+		pag := pagination(page, count, 42, "/last?channelID="+channelID+"&")
+
 		if len(subVideos) == 0 {
-			if pageLast == 0 {
+			if pag.Previous == 0 {
 				ctx.Redirect("/")
 				return
 			}
-			ctx.Redirect("/last?channelID=" + channelID + "&page=" + strconv.Itoa(pageLast))
+			ctx.Redirect("/last?channelID=" + channelID + "&page=" + strconv.Itoa(pag.Previous))
 			return
 		}
 		title = fmt.Sprintf("%s последние видео", subVideos[0].Channel)
@@ -224,11 +207,8 @@ func lastHandler(ctx *macaron.Context) {
 		ctx.Data["SubVideos"] = subVideos
 		ctx.Data["User"] = user
 		ctx.Data["SubVideo"] = models.Subvideo{}
-		ctx.Data["Page"] = pageStruct{
-			Page: page,
-			Next: pageNext,
-			Last: pageLast,
-		}
+		ctx.Data["Page"] = pag
+
 		ctx.HTML(200, "last")
 	} else {
 		ctx.Redirect("/login")
@@ -237,30 +217,24 @@ func lastHandler(ctx *macaron.Context) {
 }
 
 func indexHandler(ctx *macaron.Context) {
-	var page, pageNext, pageLast int
+	var page int
 
 	pageS := ctx.Req.FormValue("page")
 	page, err := strconv.Atoi(pageS)
 	if err != nil || page == 0 {
 		page = 1
 	}
-	pageNext = page + 1
-	pageLast = page - 1
-
 	user := currentUser(ctx.GetCookie("username"), ctx.GetCookie("crypt"))
 
 	if user.UserName != "" {
 		var title string
-		type pageStruct struct {
-			Page int
-			Next int
-			Last int
-		}
 
-		subVideos, err := clientVideo.SortVideo(user, 42, "", page)
+		subVideos, count, err := clientVideo.SortVideo(user, 42, "", page)
 		if err != nil {
 			log.Panicln(err)
 		}
+		pag := pagination(page, count, 42, "/?")
+
 		channelOnline, err := clientVideo.GetOnlineStreams(user)
 		if err != nil {
 			log.Panicln(err)
@@ -284,11 +258,7 @@ func indexHandler(ctx *macaron.Context) {
 		ctx.Data["ChannelOnline"] = channelOnline
 		ctx.Data["User"] = user
 		ctx.Data["SubVideo"] = models.Subvideo{}
-		ctx.Data["Page"] = pageStruct{
-			Page: page,
-			Next: pageNext,
-			Last: pageLast,
-		}
+		ctx.Data["Page"] = pag
 
 		ctx.HTML(200, "index")
 	} else {

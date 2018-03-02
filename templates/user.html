@@ -3,20 +3,25 @@
 {{ template "layouts/head" .HeadInfo }}
 
 <body>
-{{ template "layouts/navigation" navMenu .User .SubVideo "Поиск"}}
+  {{ template "layouts/navigation" navMenu .User .SubVideo "Поиск"}}
   <br/>
-    <div class="container">
-        <p>
-            {{ if eq .User.TWOAuth "" }}
-            <a class="btn btn-outline-light" href="{{.TwitchURL}}" role="button">Войти через Twitch</a> {{ else }}
-            <span class="badge badge-secondary">Twitch поключен</span> {{ end }} {{ if eq .User.YTOAuth "" }}
-            <a class="btn btn-outline-light" href="{{.YouTubeURL}}" role="button">Войти через YouTube</a> {{ else }}
-            <span class="badge badge-secondary">YouTube подключен</span> {{ end }}
-        </p>
-        <form action="/user" method="post">
-            <div class="form-group">
-                <label for="timezone">Выбор часового пояса:</label>
-                <select class="form-control" name="timezone">
+  <div class="container">
+    <p>
+      {{ if eq .User.TWOAuth "" }}
+      <a class="btn btn-outline-light" href="{{.TwitchURL}}" role="button">Войти через Twitch</a>
+      {{ else }}
+      <span class="badge badge-secondary">Twitch поключен</span>
+      {{ end }}
+      {{ if eq .User.YTOAuth "" }}
+      <a class="btn btn-outline-light" href="{{.YouTubeURL}}" role="button">Войти через YouTube</a>
+      {{ else }}
+      <span class="badge badge-secondary">YouTube подключен</span>
+      {{ end }}
+    </p>
+    <form action="/user" method="post">
+      <div class="form-group">
+        <label for="timezone">Выбор часового пояса:</label>
+        <select class="form-control" name="timezone">
       {{ $userTimeZone := .User.TimeZone }}
       {{ range .TimeZones }}
       {{ if ne .UTC $userTimeZone }}
@@ -26,11 +31,11 @@
       {{ end }}
       {{ end }}
     </select>
-            </div>
-            <button type="submit" class="btn btn-outline-light">Сохранить</button>
-        </form>
-        {{ template "layouts/footer" }}
-    </div>
+      </div>
+      <button type="submit" class="btn btn-outline-light">Сохранить</button>
+    </form>
+    {{ template "layouts/footer" }}
+  </div>
 </body>
 <script type="text/javascript" src="/assets/js/main.js"></script>
 

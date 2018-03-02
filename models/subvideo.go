@@ -43,19 +43,36 @@ func (subvideo Subvideo) Insert() (err error) {
 	return nil
 }
 
-func SelectVideo(userID, n int, channelID string, page int) (subvideos []Subvideo, err error) {
+func SelectVideo(userID, n int, channelID string, page int) (subvideos []Subvideo, countVideos int, err error) {
+	var countS []map[string]string
+
 	if channelID == "" {
 		err = x.Where("user_id = ?", userID).
 			Desc("date").
 			Limit(n, page*n-n).
 			Find(&subvideos)
+		if err != nil {
+			return subvideos, countVideos, err
+		}
+		countS, err = x.QueryString("SELECT count(*) FROM subvideo WHERE user_id = ?", userID)
+		if err != nil {
+			return subvideos, countVideos, err
+		}
 	} else {
 		err = x.Where("user_id = ? AND channel_id = ?", userID, channelID).
 			Desc("date").
 			Limit(n, page*n-n).
 			Find(&subvideos)
+		if err != nil {
+			return subvideos, countVideos, err
+		}
+		countS, err = x.QueryString("SELECT count(*) FROM subvideo WHERE user_id = ? AND channel_id = ?", userID, channelID)
+		if err != nil {
+			return subvideos, countVideos, err
+		}
 	}
-	return subvideos, err
+	countVideos, err = strconv.Atoi(countS[0]["count"])
+	return subvideos, countVideos, err
 }
 
 func SelectStreamVideo(userID int) (subvideos []Subvideo, err error) {
@@ -72,15 +89,21 @@ func SelectStreamVideo(userID int) (subvideos []Subvideo, err error) {
 	return subvideos, nil
 }
 
-func SearchVideo(search string, userID, n, page int) (subvideos []Subvideo, err error) {
+func SearchVideo(search string, userID, n, page int) (subvideos []Subvideo, countVideos int, err error) {
+	var countS []map[string]string
 	err = x.Where("tsv @@ plainto_tsquery(?) AND user_id = ?", search, userID).
 		Desc("date").
 		Limit(n, page*n-n).
 		Find(&subvideos)
 	if err != nil {
-		return subvideos, err
+		return subvideos, countVideos, err
 	}
-	return subvideos, nil
+	countS, err = x.QueryString("SELECT count(*) FROM subvideo WHERE tsv @@ plainto_tsquery(?) AND user_id = ?", search, userID)
+	if err != nil {
+		return subvideos, countVideos, err
+	}
+	countVideos, err = strconv.Atoi(countS[0]["count"])
+	return subvideos, countVideos, err
 }
 
 func SelectVideoForID(id string) (subvideo Subvideo, err error) {

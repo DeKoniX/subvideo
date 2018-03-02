@@ -18,7 +18,7 @@ func Init(host, port, username, password, dbname string) (err error) {
 	if err != nil {
 		return err
 	}
-	//x.ShowSQL(true)
+	// x.ShowSQL(true)
 	err = x.Sync(new(User))
 	if err != nil {
 		return err

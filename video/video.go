@@ -27,10 +27,10 @@ func Init(twClientID, twClientSecret, twRedirectURI, ytClientID, ytClientSecret,
 	}
 }
 
-func (client *ClientVideo) SortVideo(user models.User, n int, channelID string, page int) (subVideos []models.Subvideo, err error) {
-	subVideos, err = models.SelectVideo(int(user.Id), n, channelID, page)
+func (client *ClientVideo) SortVideo(user models.User, n int, channelID string, page int) (subVideos []models.Subvideo, countVideos int, err error) {
+	subVideos, countVideos, err = models.SelectVideo(int(user.Id), n, channelID, page)
 	if err != nil {
-		return subVideos, err
+		return subVideos, countVideos, err
 	}
 	for _, video := range subVideos {
 		var timezone *time.Location
@@ -41,13 +41,13 @@ func (client *ClientVideo) SortVideo(user models.User, n int, channelID string, 
 		}
 		video.Date = video.Date.In(timezone)
 	}
-	return subVideos, nil
+	return subVideos, countVideos, nil
 }
 
-func (client *ClientVideo) SearchVideo(user models.User, n, page int, search string) (subVideos []models.Subvideo, err error) {
-	subVideos, err = models.SearchVideo(search, int(user.Id), n, page)
+func (client *ClientVideo) SearchVideo(user models.User, n, page int, search string) (subVideos []models.Subvideo, countVideos int, err error) {
+	subVideos, countVideos, err = models.SearchVideo(search, int(user.Id), n, page)
 	if err != nil {
-		return subVideos, err
+		return subVideos, countVideos, err
 	}
 	for _, video := range subVideos {
 		var timezone *time.Location
@@ -58,7 +58,7 @@ func (client *ClientVideo) SearchVideo(user models.User, n, page int, search str
 		}
 		video.Date = video.Date.In(timezone)
 	}
-	return subVideos, nil
+	return subVideos, countVideos, nil
 }
 
 func (client *ClientVideo) GetOnlineStreams(user models.User) (streamOnline []models.Subvideo, err error) {

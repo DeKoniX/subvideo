@@ -3,50 +3,61 @@
 {{ template "layouts/head" .HeadInfo }}
 
 <body>
-{{ template "layouts/navigation" navMenu .User .SubVideo ""}}
-    <div class="container-fluid">
-        <div class="row">
-            {{if eq .TypeVideo "twitch"}}
-            <div class="col-md-12 p-0">
-                <iframe class="player-embed" src="http://player.twitch.tv/?video={{ .SubVideo.VideoID }}" frameborder="0" scrolling="no" allowfullscreen="true"></iframe>
-            </div>
-            {{end}} {{if eq .TypeVideo "youtube"}}
-            <div class="col-md-12 p-0">
-                <iframe class="player-embed" type="text/html" src="http://www.youtube.com/embed/{{ .SubVideo.VideoID }}?enablejsapi=1&autoplay=1&fs=1&origin={{ .HeadURL }}" frameborder="0" allowfullscreen="allowfullscreen" mozallowfullscreen="mozallowfullscreen" msallowfullscreen="msallowfullscreen" oallowfullscreen="oallowfullscreen" webkitallowfullscreen="webkitallowfullscreen"></iframe>
-            </div>
-            {{end}} {{if eq .TypeVideo "youtube-stream"}}
-            <div class="col-md-12 p-0">
-                <iframe class="player-embed" type="text/html" src="http://www.youtube.com/embed/{{ .SubVideo.VideoID }}?enablejsapi=1&autoplay=1&fs=1&origin={{ .HeadURL }}" frameborder="0" allowfullscreen="allowfullscreen" mozallowfullscreen="mozallowfullscreen" msallowfullscreen="msallowfullscreen" oallowfullscreen="oallowfullscreen" webkitallowfullscreen="webkitallowfullscreen"></iframe>
-            </div>
-            {{end}} {{if eq .TypeVideo "youtube-stream-live"}}
-            <div class="col-md-9 p-0" id="stream">
-                <div class="chat-show">
-                    <svg viewBox="0 0 6 16" id="triangle-left" width="100%" height="100%"><path fill-rule="evenodd" d="M6 2L0 8l6 6z"></path></svg>
-                </div>
-                <iframe class="player-embed" type="text/html" src="http://www.youtube.com/embed/{{ .SubVideo.VideoID }}?enablejsapi=1&autoplay=1&fs=1&origin={{ .HeadURL }}" frameborder="0" allowfullscreen="allowfullscreen" mozallowfullscreen="mozallowfullscreen" msallowfullscreen="msallowfullscreen" oallowfullscreen="oallowfullscreen" webkitallowfullscreen="webkitallowfullscreen"></iframe>
-            </div>
-            <div class="col-md-3 p-0" id="chat">
-                <div class="chat-hide">
-                    <svg viewBox="0 0 6 16" id="triangle-right" width="100%" height="100%"><path fill-rule="evenodd" d="M0 14l6-6-6-6z"></path></svg>
-                </div>
-              <iframe class="chat-embed" frameborder="0" src="http://www.youtube.com/live_chat?v={{ .SubVideo.VideoID }}&embed_domain={{ .HeadInfo.EmbedDomain }}"></iframe> 
-            </div>
-            {{end}} {{if eq .TypeVideo "twitch-stream"}}
-            <div class="col-md-9 p-0" id="stream">
-                <div class="chat-show">
-                    <svg viewBox="0 0 6 16" id="triangle-left" width="100%" height="100%"><path fill-rule="evenodd" d="M6 2L0 8l6 6z"></path></svg>
-                </div>
-                <iframe class="player-embed" src="http://player.twitch.tv/?channel={{ .SubVideo.ChannelID }}" frameborder="0" scrolling="no" allowfullscreen="true"></iframe>
-            </div>
-            <div class="col-md-3 p-0" id="chat">
-                <div class="chat-hide">
-                    <svg viewBox="0 0 6 16" id="triangle-right" width="100%" height="100%"><path fill-rule="evenodd" d="M0 14l6-6-6-6z"></path></svg>
-                </div>
-                <iframe frameborder="0" scrolling="no" class="chat-embed" src="http://www.twitch.tv/{{ .SubVideo.ChannelID }}/chat"></iframe>
-            </div>
+  {{ template "layouts/navigation" navMenu .User .SubVideo ""}}
+  <div class="container-fluid">
+    <div class="row">
+      {{if eq .TypeVideo "twitch"}}
+      <div class="col-md-12 p-0">
+        <iframe class="player-embed" src="http://player.twitch.tv/?video={{ .SubVideo.VideoID }}"
+          frameborder="0" scrolling="no" allowfullscreen="true"></iframe>
+      </div>
+      {{end}} {{if eq .TypeVideo "youtube"}}
+      <div class="col-md-12 p-0">
+        <iframe class="player-embed" type="text/html" src="http://www.youtube.com/embed/{{ .SubVideo.VideoID }}?enablejsapi=1&autoplay=1&fs=1&origin={{ .HeadURL }}"
+          frameborder="0" allowfullscreen="allowfullscreen" mozallowfullscreen="mozallowfullscreen"
+          msallowfullscreen="msallowfullscreen" oallowfullscreen="oallowfullscreen"
+          webkitallowfullscreen="webkitallowfullscreen"></iframe>
+      </div>
+      {{end}} {{if eq .TypeVideo "youtube-stream"}}
+      <div class="col-md-12 p-0">
+        <iframe class="player-embed" type="text/html" src="http://www.youtube.com/embed/{{ .SubVideo.VideoID }}?enablejsapi=1&autoplay=1&fs=1&origin={{ .HeadURL }}"
+          frameborder="0" allowfullscreen="allowfullscreen" mozallowfullscreen="mozallowfullscreen"
+          msallowfullscreen="msallowfullscreen" oallowfullscreen="oallowfullscreen"
+          webkitallowfullscreen="webkitallowfullscreen"></iframe>
+      </div>
+      {{end}} {{if eq .TypeVideo "youtube-stream-live"}}
+      <div class="col-md-9 p-0" id="stream">
+        <div class="chat-show">
+          <svg viewBox="0 0 6 16" id="triangle-left" width="100%" height="100%"><path fill-rule="evenodd" d="M6 2L0 8l6 6z"></path></svg>
         </div>
-        {{end}}
+        <iframe class="player-embed" type="text/html" src="http://www.youtube.com/embed/{{ .SubVideo.VideoID }}?enablejsapi=1&autoplay=1&fs=1&origin={{ .HeadURL }}"
+          frameborder="0" allowfullscreen="allowfullscreen" mozallowfullscreen="mozallowfullscreen"
+          msallowfullscreen="msallowfullscreen" oallowfullscreen="oallowfullscreen"
+          webkitallowfullscreen="webkitallowfullscreen"></iframe>
+      </div>
+      <div class="col-md-3 p-0" id="chat">
+        <div class="chat-hide">
+          <svg viewBox="0 0 6 16" id="triangle-right" width="100%" height="100%"><path fill-rule="evenodd" d="M0 14l6-6-6-6z"></path></svg>
+        </div>
+        <iframe class="chat-embed" frameborder="0" src="http://www.youtube.com/live_chat?v={{ .SubVideo.VideoID }}&embed_domain={{ .HeadInfo.EmbedDomain }}"></iframe>
+      </div>
+      {{end}} {{if eq .TypeVideo "twitch-stream"}}
+      <div class="col-md-9 p-0" id="stream">
+        <div class="chat-show">
+          <svg viewBox="0 0 6 16" id="triangle-left" width="100%" height="100%"><path fill-rule="evenodd" d="M6 2L0 8l6 6z"></path></svg>
+        </div>
+        <iframe class="player-embed" src="http://player.twitch.tv/?channel={{ .SubVideo.ChannelID }}"
+          frameborder="0" scrolling="no" allowfullscreen="true"></iframe>
+      </div>
+      <div class="col-md-3 p-0" id="chat">
+        <div class="chat-hide">
+          <svg viewBox="0 0 6 16" id="triangle-right" width="100%" height="100%"><path fill-rule="evenodd" d="M0 14l6-6-6-6z"></path></svg>
+        </div>
+        <iframe frameborder="0" scrolling="no" class="chat-embed" src="http://www.twitch.tv/{{ .SubVideo.ChannelID }}/chat"></iframe>
+      </div>
     </div>
+    {{end}}
+  </div>
 </body>
 <script type="text/javascript" src="/assets/js/video.js"></script>
 {{ template "metrics/yandex" metrics }} {{ template "metrics/google" metrics }}

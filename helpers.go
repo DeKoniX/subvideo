@@ -138,3 +138,42 @@ func metrics() (met Metrics) {
 	met.Google = config.Metrics.Google
 	return met
 }
+
+type paginationStruct struct {
+	Previous int
+	Page     int
+	Next     int
+	Last     int
+	URL      string
+}
+
+func pagination(page, count, n int, url string) (p paginationStruct) {
+	p.Page = page
+	p.Last = count / n
+	r := count % n
+	if r > 0 {
+		p.Last++
+	}
+	switch p.Page {
+	case 1:
+		p.Previous = 0
+		if count <= n {
+			p.Next = 0
+		} else {
+			p.Next = 2
+		}
+	case p.Last:
+		p.Previous = p.Last - 1
+		p.Next = 0
+	default:
+		p.Previous = p.Page - 1
+		p.Next = p.Page + 1
+	}
+	p.URL = url
+
+	return p
+}
+
+func minus(a, b int) int {
+	return a - b
+}

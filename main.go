@@ -83,6 +83,7 @@ func main() {
 			"navMenu":              navMenu,
 			"dateStreamLen":        dateStreamLen,
 			"userTimeZoneAndVideo": userTimeZoneAndVideo,
+			"minus":                minus,
 		}},
 	}))
 	m.Use(macaron.Static("public"))
