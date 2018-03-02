@@ -84,6 +84,7 @@ func main() {
 			"dateStreamLen":        dateStreamLen,
 			"userTimeZoneAndVideo": userTimeZoneAndVideo,
 			"minus":                minus,
+			"hashFile":             hashFile,
 		}},
 	}))
 	m.Use(macaron.Static("public"))

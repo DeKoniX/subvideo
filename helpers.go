@@ -2,10 +2,12 @@ package main
 
 import (
 	"crypto/md5"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
+	"os"
 	"time"
 
 	"github.com/DeKoniX/subvideo/models"
@@ -176,4 +178,22 @@ func pagination(page, count, n int, url string) (p paginationStruct) {
 
 func minus(a, b int) int {
 	return a - b
+}
+
+func hashFile(fileName string) (returnMD5String string) {
+	file, err := os.Open("public/assets" + fileName)
+	if err != nil {
+		return ""
+	}
+	defer file.Close()
+
+	hash := md5.New()
+	if _, err := io.Copy(hash, file); err != nil {
+		return ""
+	}
+
+	hashInBytes := hash.Sum(nil)[:16]
+	returnMD5String = hex.EncodeToString(hashInBytes)
+
+	return returnMD5String
 }
