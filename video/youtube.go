@@ -5,12 +5,12 @@ import (
 	"log"
 	"strconv"
 
-	"strings"
 	"time"
 
 	"errors"
 
 	"github.com/DeKoniX/subvideo/models"
+	duration "github.com/channelmeter/iso8601duration"
 	"golang.org/x/oauth2"
 	"google.golang.org/api/plus/v1"
 	"google.golang.org/api/youtube/v3"
@@ -148,11 +148,11 @@ func (yt *YT) GetVideos(user models.User) (videos []models.Subvideo, err error) 
 			}
 
 			for _, video := range responseVideos.Items {
-
-				durationVideo, err := time.ParseDuration(strings.ToLower(video.ContentDetails.Duration[2:]))
+				durationParser, err := duration.FromString(video.ContentDetails.Duration)
 				if err != nil {
 					return videos, err
 				}
+				durationVideo := durationParser.ToDuration()
 
 				switch video.Snippet.LiveBroadcastContent {
 				case "upcoming":
