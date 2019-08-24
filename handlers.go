@@ -229,6 +229,8 @@ func indexHandler(ctx *macaron.Context) {
 	if user.UserName != "" {
 		var title string
 
+		// TODO: display panic error to user
+
 		subVideos, count, err := clientVideo.SortVideo(user, 42, "", page)
 		if err != nil {
 			log.Panicln(err)
