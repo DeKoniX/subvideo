@@ -32,3 +32,4 @@ _testmain.go
 subvideo.iml
 node_modules/
 tmp/
+/vendor/
