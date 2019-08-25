@@ -2,17 +2,17 @@
     <meta charset="utf-8">
     <title>{{ .Title }} | SubVideo</title>
     {{ if ne .Description "" }}
-    <meta name="description" content="{{ .Description }}" />
-    <meta property="og:description" content="{{ .Description }}" /> {{ end }} {{ if ne .ImageURL "" }}
-    <meta property="og:image" content="{{ .ImageURL }}" />
-    <link rel="image_src" href="{{ .ImageURL }}" /> {{ end }}
-    <meta property="og:url" content="{{ .URL }}" />
-    <meta property="og:title" content="{{ .Title }}" />
+        <meta name="description" content="{{ .Description }}"/>
+        <meta property="og:description" content="{{ .Description }}"/> {{ end }} {{ if ne .ImageURL "" }}
+        <meta property="og:image" content="{{ .ImageURL }}"/>
+        <link rel="image_src" href="{{ .ImageURL }}"/> {{ end }}
+    <meta property="og:url" content="{{ .URL }}"/>
+    <meta property="og:title" content="{{ .Title }}"/>
 
-    <link href="/assets/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="/assets/css/bootstrap-reboot.min.css" rel="stylesheet" />
-    <link href="/assets/css/bootstrap-grid.min.css" rel="stylesheet" />
-    <link href="/assets/css/main.css?{{ hashFile "/css/main.css" }}" rel="stylesheet" />
+    <link href="/assets/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="/assets/css/bootstrap-reboot.min.css" rel="stylesheet"/>
+    <link href="/assets/css/bootstrap-grid.min.css" rel="stylesheet"/>
+    <link href="/assets/css/main.css?{{ hashFile "/css/main.css" }}" rel="stylesheet"/>
 
     <script type="text/javascript" src="/assets/js/jquery-3.2.1.min.js"></script>
     <script type="text/javascript" src="/assets/js/popper.min.js"></script>

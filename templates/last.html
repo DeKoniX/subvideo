@@ -3,19 +3,19 @@
 {{ template "layouts/head" .HeadInfo }}
 
 <body>
-  {{ template "layouts/navigation" navMenu .User .SubVideo "Поиск"}}
-  <br>
-  <div class="container">
+{{ template "layouts/navigation" navMenu .User .SubVideo "Поиск"}}
+<br>
+<div class="container">
     <h2>Последние видео {{ $channel := index .SubVideos 0}}{{ $channel.Channel }}</h2>
     <div class="row">
-      {{ $UserTimeZone := .User.TimeZone }} {{ range $index, $ := .SubVideos }} {{ if split $index 3 }}
-      <div class="clearfix hidden-xs"></div>
-      {{ end }} {{ template "video" userTimeZoneAndVideo . $UserTimeZone }} {{ end }}
+        {{ $UserTimeZone := .User.TimeZone }} {{ range $index, $ := .SubVideos }} {{ if split $index 3 }}
+            <div class="clearfix hidden-xs"></div>
+        {{ end }} {{ template "video" userTimeZoneAndVideo . $UserTimeZone }} {{ end }}
     </div>
     <br>
     {{ template "layouts/pagination" .Page }}
     {{ template "layouts/footer" }}
-  </div>
+</div>
 </body>
 <script type="text/javascript" src="/assets/js/main.js?{{ hashFile "/js/main.js" }}"></script>
 
