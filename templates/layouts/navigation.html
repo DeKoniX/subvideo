@@ -31,7 +31,7 @@
               src="/twitch.png" alt="Twitch.navbar-dark .navbar-brand:nover
 "/> {{.SubVideo.Channel}}
           </a> {{end}} {{if eq .SubVideo.TypeSub "twitch-stream"}}
-          <a href="https://www.twitch.tv/{{.SubVideo.ChannelID}}" class="dropdown-item" target="_blank"><img
+          <a href="{{.SubVideo.URL}}" class="dropdown-item" target="_blank"><img
               src="/twitch.png" alt="Twitch"/> {{.SubVideo.Channel}}
           </a> {{end}} {{ if ne .User.UserName "" }}
           <a href="/last?channelID={{.SubVideo.ChannelID}}" class="dropdown-item">Последние видео</a>          {{ end }}

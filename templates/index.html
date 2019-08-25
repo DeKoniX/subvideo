@@ -43,11 +43,16 @@
             </button>
               <div class="dropdown-menu" aria-labelledby="dropdownMenu">
                 {{if eq .TypeSub "youtube-stream"}}
-                <a class="dropdown-item" href="https://www.youtube.com/channel/{{.ChannelID}}" target="_blank"><img src="/ytube.png" alt="YouTube" /> {{.Channel}}
-                                </a> {{end}} {{if eq .TypeSub "youtube-stream-live"}}
-                <a class="dropdown-item" href="https://www.youtube.com/channel/{{.ChannelID}}" target="_blank"><img src="/ytube.png" alt="YouTube" /> {{.Channel}}
-                                </a> {{end}} {{if eq .TypeSub "twitch-stream"}}
-                <a class="dropdown-item" href="https://www.twitch.tv/{{$channel.ChannelID}}" target="_blank"><img src="/twitch.png" alt="Twitch" /> {{ $channel.Channel }}</a>                {{end}}
+                <a class="dropdown-item" href="https://www.youtube.com/channel/{{.ChannelID}}" target="_blank">
+                  <img src="/ytube.png" alt="YouTube" /> {{.Channel}}
+                </a>
+                {{end}} {{if eq .TypeSub "youtube-stream-live"}}
+                <a class="dropdown-item" href="https://www.youtube.com/channel/{{.ChannelID}}" target="_blank">
+                  <img src="/ytube.png" alt="YouTube" /> {{.Channel}} </a>
+                {{end}} {{if eq .TypeSub "twitch-stream"}}
+                <a class="dropdown-item" href="https://www.twitch.tv/{{$channel.Channel}}" target="_blank">
+                  <img src="/twitch.png" alt="Twitch" /> {{ $channel.Channel }}</a>
+                {{end}}
                 <a class="dropdown-item" href="/last?channelID={{$channel.ChannelID}}">Последние видео</a>
               </div>
             </div>

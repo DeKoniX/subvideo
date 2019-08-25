@@ -128,6 +128,7 @@ func (tw *TW) GetOnline(oauth string) (videos []models.Subvideo, err error) {
 			}
 			Channel struct {
 				Status      string `json:"status"`
+				Name        string `json:"name"`
 				DisplayName string `json:"display_name"`
 				ID          int    `json:"_id"`
 				URL         string `json:"url"`
@@ -149,7 +150,7 @@ func (tw *TW) GetOnline(oauth string) (videos []models.Subvideo, err error) {
 		videos = append(videos, models.Subvideo{
 			TypeSub:   "twitch-stream",
 			Title:     stream.Channel.Status,
-			Channel:   stream.Channel.DisplayName,
+			Channel:   stream.Channel.Name,
 			ChannelID: strconv.Itoa(stream.Channel.ID),
 			Game:      stream.Game,
 			ThumbURL:  stream.Preview.Large,
@@ -181,6 +182,7 @@ func (tw *TW) GetVideos(oauth string) (videos []models.Subvideo, err error) {
 			Channel struct {
 				ID          int    `json:"_id"`
 				DisplayName string `json:"display_name"`
+				Name        string `json:"name"`
 			}
 		}
 	}
@@ -200,7 +202,7 @@ func (tw *TW) GetVideos(oauth string) (videos []models.Subvideo, err error) {
 			videos = append(videos, models.Subvideo{
 				TypeSub:     "twitch",
 				Title:       video.Title,
-				Channel:     video.Channel.DisplayName,
+				Channel:     video.Channel.Name,
 				ChannelID:   strconv.Itoa(video.Channel.ID),
 				Game:        video.Game,
 				Description: video.Description,
@@ -223,6 +225,7 @@ func (tw *TW) GetChannel(oauth, channelID string) (video models.Subvideo, err er
 	}
 
 	type jsonTW struct {
+		ID          string `json:"_id"`
 		Status      string `json:"status"`
 		DisplayName string `json:"display_name"`
 		Game        string `json:"game"`
@@ -244,8 +247,8 @@ func (tw *TW) GetChannel(oauth, channelID string) (video models.Subvideo, err er
 	return models.Subvideo{
 		TypeSub:   "twitch-stream",
 		Title:     jsontw.Status,
-		Channel:   jsontw.DisplayName,
-		ChannelID: jsontw.Name,
+		Channel:   jsontw.Name,
+		ChannelID: jsontw.ID,
 		Game:      jsontw.Game,
 		URL:       jsontw.URL,
 	}, nil

@@ -6,14 +6,12 @@
     <div class="card-body">
       {{if eq .Video.TypeSub "twitch"}}
       <a href="{{.Video.URL}}" target="_blank">
-        <h5><img src="/twitch.png" alt="Twitch" /> {{.Video.Title}}
-        </h5>
+        <h5><img src="/twitch.png" alt="Twitch" /> {{.Video.Title}} </h5>
       </a>
       <h6>{{.Video.Game}}</h6>
       {{else}}
       <a href="{{.Video.URL}}" target="_blank">
-        <h5><img src="/ytube.png" alt="YouTube" /> {{.Video.Title}}
-        </h5>
+        <h5><img src="/ytube.png" alt="YouTube" /> {{.Video.Title}} </h5>
       </a>
       {{end}}
       <p class="card-text">{{videoLen .Video.Length}}</p>
@@ -26,7 +24,7 @@
         </button>
         <div class="dropdown-menu">
           {{if eq .Video.TypeSub "twitch"}}
-          <a class="dropdown-item" href="https://www.twitch.tv/{{.Video.ChannelID}}" target="_blank"><img src="/twitch.png" alt="Twitch" /> {{.Video.Channel}}
+          <a class="dropdown-item" href="https://www.twitch.tv/{{.Video.Channel}}" target="_blank"><img src="/twitch.png" alt="Twitch" /> {{.Video.Channel}}
                     </a> {{else}}
           <a class="dropdown-item" href="https://www.youtube.com/channel/{{.Video.ChannelID}}"
             target="_blank"><img src="/ytube.png" alt="YouTube" /> {{.Video.Channel}}
