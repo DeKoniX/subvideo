@@ -141,7 +141,7 @@ func runTime() {
 	}
 
 	for {
-		if time.Now().Minute()%30 == 0 && run {
+		if time.Now().Minute() == 0 && run {
 			log.Println("RUN groutine")
 			run = false
 			users, err = models.SelectUsers()
